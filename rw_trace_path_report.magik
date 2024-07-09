@@ -1,0 +1,471 @@
+#% text_encoding = iso8859_1
+_package sw
+
+##
+## This generates an Excel spreadsheet listing all contents and
+## connectivity at a splice.
+##
+## PURPOSE and RESPONSIBILITIES
+## Retrieve connectivity from a splice, output this to
+## excel in a defined format. 
+##
+## CONSTRAINTS
+## The report is written to run on a single splice at a
+## time, creating a single worksheet in a new workbook.  It is
+## not possible to generate multiple worksheets, in a single
+## workbook. This would require code refactoring. 
+##
+## PUBLIC INTERFACES
+## <the list of offered public interfaces>
+##
+## REFERENCED CLASSES (MODULES)
+##   excel ( mit_excel )
+##   copper_splice ( mit_copper_splice )
+##   splice_closure ( mit_splice_closure)
+##   sheath_splice ( mit_sheath_splice )
+##
+## REFERENCED INTERFACES
+##   if_copper_splice
+##   if_splice_closure
+##   if_sheath_splice
+##
+
+# This exemplar creates an excel report to display all the
+# connections at a splice object.
+
+remex(:rw_trace_path_report)
+$
+
+_pragma(classify_level=basic, topic={rw_trace_path_report}, usage={internal})
+def_slotted_exemplar( :rw_trace_path_report,
+                      {
+                              { :data             , _unset, :writable },
+                              { :connection_row   , _unset, :writable }
+                      },
+                      { :excel } )
+$
+
+
+# Shared constants
+# ===============
+
+_pragma(classify_level=restricted, topic={rw_trace_path_report})
+rw_trace_path_report.define_shared_constant(:bad_file_name_chars,
+	 ## defines characters that are either not allowed in filenames
+	 ## or cause peculiar problems with the OLE client...
+	 {%/, %\, %:, %*, %?, %", %<, %>, %|, % , %], %[},
+	 :private)
+$
+
+_pragma(classify_level=basic, topic={rw_trace_path_report}, usage={internal})
+rw_trace_path_report.define_shared_constant(:delimiter,
+        character.tab.write_string,
+        :public)
+$
+
+_pragma(classify_level=basic, topic={rw_trace_path_report}, usage={internal})
+## the name of the wgs84 coordinate system, that is used for
+## the transformation of the location coordinates
+rw_trace_path_report.define_shared_constant(:wgs84_long_lat_name,
+	:world_longlat_wgs84_degree,
+        :public)
+$
+
+#-------------------------------------------------------------------------------
+
+_pragma(classify_level=basic, topic={rw_trace_path_report}, usage={external})
+_method rw_trace_path_report.new( a_data, _optional visible? )
+        ##
+        ##  A_SITE should be a splice.
+        ##  A_WIDGET is a windows clipboard owner
+	##  VISIBLE? controls whether the Excel application is
+	##  made visible.  Default value is TRUE.
+	##
+	
+        >> _self.init( a_data, visible? )
+_endmethod
+$
+
+_pragma(classify_level=restricted, topic={rw_trace_path_report}, usage={external})
+_method rw_trace_path_report.init( a_data , _optional visible?)
+	## 
+	##  Initialise a report for a specified trace results data ( A_DATA)
+	##
+	##  VISIBLE? controls whether the Excel application is
+	##  made visible.  Default value is TRUE.
+	##
+	
+        _super.init()
+	
+        #.a_grs << a_widget 
+	
+        # Set SITE (a splice)
+        .data << a_data
+		.connection_row << 14
+	>> _self 
+_endmethod
+$
+
+_pragma(classify_level=restricted, topic={rw_trace_path_report}, usage={subclassable})
+_method rw_trace_path_report.filename
+	## 
+	## Return a default filename for the report.
+	##
+	## This method is been sub-classed to return the filename for
+	## splice report.
+	##
+	
+	# "E:\Customer\FCX\BackupCopy\rw_trace_diagram\Logical Service Line Diagram - Connector Level - Tempate.xlt"
+	# write(.data.an_element()[:vendor_order_no])
+	filename << "Logical Service Line Diagram - Connector Level - " + .data.an_element()[:vendor_order_no] + ".xls"
+
+	# remove any invalid file name characters 
+	_for bad_file_name_char _over _self.bad_file_name_chars.fast_elements()
+	_loop
+		filename.substitute_character( bad_file_name_char, %_)
+	_endloop
+	
+	>> filename
+	
+_endmethod
+$
+
+_pragma(classify_level=basic, topic={rw_trace_path_report}, usage={external})
+_method rw_trace_path_report.write_header_data()
+        ##
+        ## Writes header or  metadata section in the report.
+        ##
+	_dynamic !current_coordinate_system!
+	_dynamic !print_float_precision!
+
+	_if .data _isnt _unset
+	_then
+		#print(.data)
+		str_project << "Test Service " + .data.first[:vendor_order_no].write_string + " (" +  .data.first[:facility_provider].write_string + " to " + .data.last[:facility_provider].write_string + ")"
+	_else
+		str_project << "No Data Received"
+	_endif
+
+	_self.write_to_cell(str_project, 1, 7) # Cell G1
+		
+_endmethod
+$
+
+_pragma(classify_level=basic, topic={rw_trace_path_report}, usage={external})
+_method rw_trace_path_report.write_report_data()
+        ##
+        ## Writes header or  metadata section in the report.
+        ##
+	_dynamic !current_coordinate_system!
+	_dynamic !print_float_precision!
+	write("template")
+	_self.open_template( _self.template_pathname, _false )
+	# Open main report sheet.
+	#
+	_self.get_sheet_by_name( "Sheet1" )
+
+	# TODO rename the sheet to the Work Order Number
+	#_if ( a_name << .site.name ) _isnt _unset _andif _not a_name.empty?
+	#_then 
+	#	_self.set_current_sheet_name( a_name )
+	#_endif
+		
+	_if .data _isnt _unset
+	_then
+		_self.write_header_data()
+		l_count << 0
+		l_max <<  .data.size
+		_for r _over .data.fast_elements()
+		_loop
+			l_count +<< 1
+			(l_row, l_coll ) << l_count.div_mod(3) # based on tempate layout = 3 collumns
+			_if l_coll <> 0
+			_then
+				l_row << l_row + 1
+			_else
+				l_coll << 3
+			_endif
+			_self.write_data_block(r, l_row, l_coll, l_count = l_max)
+			_if (1 < l_count _and l_count <= l_max )
+			_then
+				_self.write_block_structure(l_row, l_coll, l_count = l_max)
+				_if l_coll = 3 _andif l_count < l_max
+				_then
+					_self.drow_connection_line(l_row)
+				_endif
+			_endif
+		_endloop
+	_else
+		write("No data were provided!")
+		_return
+	_endif
+
+	_self.save_file("C:\Syaddad\2024\STF\script\rw_trace_diagram")
+	_self.release()
+		
+_endmethod
+$
+
+_pragma(classify_level=basic, topic=rw_trace_path_report, usage=internal)
+_method rw_trace_path_report.write_data_block(a_data, a_row, a_coll, last_record?)
+	##
+	##  Write a block of data information into
+	##  template for output report files.
+	##
+	
+	_local l_site_row,  l_conn_row, l_current_row
+	_local l_site_coll, l_conn_coll
+	
+	_local l_row_gap << 21
+	_local l_coll_gap << 6
+	
+	l_site_row << 6
+	l_conn_row << 13
+
+	l_site_coll << l_coll_gap * a_coll	
+	l_conn_coll << l_coll_gap * a_coll		
+
+	_if a_row > 1
+	_then 
+		l_site_row << l_site_row + l_row_gap * (a_row - 1)
+		l_conn_row << l_conn_row + l_row_gap * (a_row - 1)
+	_endif
+
+
+	# Site & Ports Data
+	_self.write_to_cell(a_data[:vendor], l_site_row, l_site_coll)	
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _unset, {:xlEdgeTop, :xlMedium, :xlEdgeLeft, :xlMedium})	
+	_self.write_to_cell(a_data[:facility_provider], l_site_row +<< 1, l_site_coll)	
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:address], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:lat_long], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:level_sty], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:room], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:rack], l_site_row +<< 1, l_site_coll)	
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:shelf], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:fiber_no], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:fiber_type], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:connector_type], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:circuit_id], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:vendor_order_no], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:google_site_id], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeLeft, :xlMedium})
+	_self.write_to_cell(a_data[:vendor_site_id], l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), {:horizontalalignment, :xlCenter, :verticalalignment, :xlTop}, _false, {:xlEdgeBottom, :xlMedium, :xlEdgeLeft, :xlMedium})
+
+	# Connection Sheath Data
+	_if ~last_record?
+	_then	
+		l_conn_coll << l_conn_coll + 3
+		#write ("Connection Collumn " + l_conn_coll.write_string + " : " + "".concatenation(a_data[:connection][:estimated_dist].write_string, " - ", a_data[:connection][:measured_dist].write_string, " - ", a_data[:connection][:connection_type]))
+		#write("Connection Collumn " + l_conn_row.write_string)
+		_if a_data[:connection] _isnt _unset
+		_then
+			_self.write_to_cell(a_data[:connection][:estimated_dist].default("").write_string, l_conn_row, l_conn_coll)
+			_self.format_cells("".concatenation((l_conn_coll).as_alpha_index_string(),l_conn_row.write_string))	
+			_self.write_to_cell(a_data[:connection][:measured_dist].default("").write_string, l_conn_row+<< 1, l_conn_coll)
+			_self.format_cells("".concatenation((l_conn_coll).as_alpha_index_string(),l_conn_row.write_string))	
+			_self.write_to_cell(a_data[:connection][:connection_type].default(""), l_conn_row+<< 1, l_conn_coll)
+			_self.format_cells("".concatenation((l_conn_coll).as_alpha_index_string(),l_conn_row.write_string))
+		_endif
+	_endif
+_endmethod
+$
+
+_pragma(classify_level=basic, topic=rw_trace_path_report, usage=internal)
+_method rw_trace_path_report.write_block_structure(a_row, a_coll, last_record?)
+	##
+	##  Write a block of data information into
+	##  template for output report files.
+	##
+	
+	_local l_site_row,  l_conn_row
+	_local l_in_port_coll, l_out_port_coll, l_conn_coll
+	
+	_local l_row_gap << 21
+	_local l_coll_gap << 6
+	
+	l_in_port_coll << 4
+	l_out_port_coll << 7
+	l_conn_coll << 8
+	
+	l_site_row << 6 
+	l_conn_row << 13
+	
+	l_site_coll << l_coll_gap * a_coll	
+	l_conn_coll << l_coll_gap  * a_coll		
+
+	_if a_row > 1
+	_then 
+		l_site_row << l_site_row + l_row_gap * (a_row - 1)
+		l_conn_row << l_conn_row + l_row_gap * (a_row - 1)
+	_endif
+	
+	l_last_conn_row << l_conn_row
+	l_last_site_row << l_site_row	
+	
+	# Left Structure Block Side
+	l_site_coll << l_site_coll - 2
+	l_site_row << l_last_site_row
+	_self.merge_and_set_cell("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+6).write_string), _true, "Ports")
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+6).write_string), {:orientation, :xlUpward, :horizontalalignment, :xlCenter, :verticalalignment, :xlCenter}, _true, {:xlEdgeLeft, :xlMedium, :xlEdgeTop, :xlMedium, :xlEdgeRight, :xlMedium})
+	_self.merge_and_set_cell("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+7).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+8).write_string), _false, "")	
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+7).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+8).write_string), _unset, _unset, {:xlEdgeLeft, :xlMedium, :xlEdgeRight, :xlMedium})
+	_self.merge_and_set_cell("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+9).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+14).write_string), _true, "Input")
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+9).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+14).write_string), {:orientation, :xlUpward, :horizontalalignment, :xlCenter, :verticalalignment, :xlCenter}, _true, {:xlEdgeLeft, :xlMedium, :xlEdgeBottom, :xlMedium, :xlEdgeRight, :xlMedium})
+	
+	# Site & Ports Data
+	l_site_coll << l_site_coll + 1	
+	_self.write_to_cell("Vendor", l_site_row, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), _unset, _unset, {:xlEdgeTop, :xlMedium})
+	_self.write_to_cell("Facility Provider", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Address", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Lat/ Long", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Level/ Sty", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Room", l_site_row +<< 1, l_site_coll)	
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Rack", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Shelf", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Fiber No", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Fiber Type", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Connector Type", l_site_row +<< 1, l_site_coll)
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Circuit ID", l_site_row +<< 1, l_site_coll) 
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Vendor Order No", l_site_row +<< 1, l_site_coll) 
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Google Site ID", l_site_row +<< 1, l_site_coll) 
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string))
+	_self.write_to_cell("Vendor Site ID", l_site_row +<< 1, l_site_coll) 
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string), _unset, _unset, {:xlEdgeBottom, :xlMedium})	
+
+
+	# Left Structure Block Side
+	l_site_row << l_last_site_row
+	l_site_coll << l_site_coll + 2	
+	_self.merge_and_set_cell("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+6).write_string), _true, "Ports")
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_site_row.write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+6).write_string), {:orientation, :xlUpward, :horizontalalignment, :xlCenter, :verticalalignment, :xlCenter}, _true, {:xlEdgeLeft, :xlMedium, :xlEdgeTop, :xlMedium, :xlEdgeRight, :xlMedium})
+	_self.merge_and_set_cell("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+7).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+8).write_string), _false, "")	
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+7).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+8).write_string), _unset, _unset, {:xlEdgeLeft, :xlMedium, :xlEdgeRight, :xlMedium})	
+	_self.merge_and_set_cell("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+9).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+14).write_string), _true, "Output")
+	_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),(l_site_row+9).write_string, ":", (l_site_coll).as_alpha_index_string(), (l_site_row+14).write_string), {:orientation, :xlUpward, :horizontalalignment, :xlCenter, :verticalalignment, :xlCenter}, _true, {:xlEdgeLeft, :xlMedium, :xlEdgeBottom, :xlMedium, :xlEdgeRight, :xlMedium})
+
+
+	# Connection Sheath Data	
+	_if ~last_record?
+	_then
+		l_site_coll << l_site_coll + 1	
+		l_conn_row << l_last_conn_row	
+		_self.write_to_cell("Est Optical Dist (Km)", l_conn_row, l_site_coll)
+		_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_conn_row.write_string))
+		#_self.write_to_cell("", l_conn_row, l_site_coll+1)	
+		_self.format_cells("".concatenation((l_site_coll+1).as_alpha_index_string(),l_conn_row.write_string))		
+		_self.write_to_cell("Meas Optical Dist (Km)", l_conn_row +<< 1, l_site_coll )	
+		_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_conn_row.write_string))
+		#_self.write_to_cell("", l_conn_row, l_site_coll+1)
+		_self.format_cells("".concatenation((l_site_coll+1).as_alpha_index_string(),l_conn_row.write_string))		
+		_self.write_to_cell("Type of connection", l_conn_row +<< 1, l_site_coll )
+		_self.format_cells("".concatenation((l_site_coll).as_alpha_index_string(),l_conn_row.write_string))
+		#_self.write_to_cell("", l_conn_row, l_site_coll+1)	
+		_self.format_cells("".concatenation((l_site_coll+1).as_alpha_index_string(),l_conn_row.write_string))		
+	_endif
+_endmethod
+$
+
+_pragma(classify_level=basic, topic=rw_trace_path_report, usage=internal)
+_method rw_trace_path_report.template_pathname
+	##
+	##  Returns the pathname of the .xlt file that is used as the
+	##  template for output report files.
+	##
+	##  If you decide to store a template in a different directory
+	##  or with a different name, replace this method.
+	##
+	## This method is been sub-classed for splice reports.
+	##
+	
+	#_return smallworld_product.get_data_file( _self.report_filename, _self.module_name)
+	
+	_return "C:\Syaddad\2024\STF\script\rw_trace_diagram\Logical Service Line Diagram - Connector Level - Tempate.xlt"
+	
+_endmethod
+$
+
+
+_pragma(classify_level=basic, topic=rw_trace_path_report, usage=internal)
+_method rw_trace_path_report.format_cells(a_cell_range, _optional a_properties, bold?, a_borders)
+	_self.cells_activate(a_cell_range)
+	_if a_properties _isnt _unset 
+	_then
+		_self.set_cell_format(a_properties)	
+	_endif
+	_if bold?.default(_false)
+	_then
+		.current_cell.font.bold << _true
+	_endif
+	_if a_borders _is _unset 
+	_then
+		.current_cell.Borders().LineStyle << :xlContinuous
+		.current_cell.Borders().Weight << :xlThin		
+	_else
+		.current_cell.Borders().LineStyle << :xlContinuous
+		.current_cell.Borders().Weight << :xlThin		
+        _for i _over range(1, a_borders.size,2)
+        _loop
+			#:xlMedium -4138
+			#:xlThick 4
+            a_key << a_borders[i]		
+			.current_cell.Borders(a_key).LineStyle << :xlContinuous
+			.current_cell.Borders(a_key).Weight << a_borders[i+1]	
+		_endloop
+	_endif
+	#:xlDouble
+_endmethod
+$
+
+_pragma(classify_level=basic, topic=rw_trace_path_report, usage=internal)
+_method rw_trace_path_report.drow_connection_line(a_row)
+	
+
+	
+	_self.cells_activate("V" + .connection_row.write_string)
+	# :xlMedium
+	.current_cell.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+	.current_cell.Borders(:xlEdgeTop).Weight << :xlMedium
+	_self.cells_activate("".concatenation("V", .connection_row.write_string, ":V", (.connection_row+9).write_string))	
+	.current_cell.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+	.current_cell.Borders(:xlEdgeRight).Weight << :xlMedium	
+	#_self.cells_activate("".concatenation("V",(.connection_row+9).write_string))	
+	#.current_cell.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+	#.current_cell.Borders(:xlEdgeRight).Weight << :xlMedium	
+	_self.cells_activate("".concatenation("C", (.connection_row+10).write_string, ":V", (.connection_row+10).write_string))
+	.current_cell.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+	.current_cell.Borders(:xlEdgeTop).Weight << :xlMedium
+	_self.cells_activate("".concatenation("C", (.connection_row+10).write_string, ":C", (.connection_row+20).write_string))
+	.current_cell.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+	.current_cell.Borders(:xlEdgeLeft).Weight << :xlMedium	
+	_self.cells_activate("C" + (.connection_row+21).write_string)
+	.current_cell.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+	.current_cell.Borders(:xlEdgeTop).Weight << :xlMedium
+	.connection_row << .connection_row + 21 
+_endmethod
+$

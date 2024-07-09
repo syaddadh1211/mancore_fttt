@@ -1,0 +1,528 @@
+_pragma(classify_level=restricted,topic=pni_tracing_plugin)
+_method pni_trace_result_lister.start_rw_trace_diagram()
+
+        start_node_number << 0
+		report_data << hash_table.new()
+		_for start_node _over _self.start_nodes.fast_elements()
+		_loop
+			engine  << _self.current_nf_manager
+			start_node_number +<< 1
+			_if start_node_number = 1
+			_then
+				write("Node " + start_node_number.write_string)
+			    
+				#write("Start Node - " + start_node.id.write_string)
+				#write( "Port(",start_node.port_text_text, ")")				
+				#hub
+				#write( start_node.rme_owner.name)
+				#bay
+				#write("Bay ", start_node.actual_structure.description)
+				#jumlah port dalam hub
+				#write( "Jumlah port : ",start_node.rme_owner.all_rme_port_components().size)
+				
+				write(newline_char)
+				_self.rw_process_nodes(engine.trace_engine_for_node( start_node ).all_nodes(), start_node.fiber_number)
+			 
+				#report_data[start_node_number] << _self.rw_build_network_trace_path(start_node, engine.trace_engine_for_node( start_node ).all_nodes())				
+			_else
+				_return 
+			#	write("Node " + start_node_number.write_string)			
+				#write("Start Node - " + start_node.id.write_string)
+				#write( "Port(",start_node.port_text_text, ")")				
+				#hub
+				#write( start_node.rme_owner.name)
+				#bay
+				#write("Bay ", start_node.actual_structure.description)
+				#jumlah port dalam hub
+				#write( "Jumlah port : ",start_node.rme_owner.all_rme_port_components().size)
+				
+				write(newline_char)
+				_self.rw_process_nodes(engine.trace_engine_for_node( start_node ).all_nodes())
+				#report_data[start_node_number] << _self.rw_build_network_trace_path(start_node, engine.trace_engine_for_node( start_node ).all_nodes())	
+			_endif
+		_endloop
+	#	_self.rw_write_trace_diagram(report_data)
+_endmethod
+$
+
+_pragma(classify_level=restricted,topic=pni_tracing_plugin)
+_method pni_trace_result_lister.rw_process_nodes(a_nodes, fiber_number)
+
+	s << swg_dsn_admin_engine.get_current_job()
+
+	_if s _is _unset
+	_then
+		write("No Design Selected")
+		_leave 
+	_endif
+
+	id << s.id.write_string 
+	nama << s.name.write_string
+	owner << s.owner.write_string
+	pj << s.inf_project.write_string
+	st << s.status.write_string	
+
+	change_set << mit_scheme_record_change_set.new(s)
+
+	#From hub -> access point (detect cables) connect to poles
+	# until ODP/ODC
+		
+	object_filtered << rope.new_with(:mit_hub) # :optical_splitter, :mit_hub)
+	jml_hub << 0
+	
+	obj_tree << rope.new()
+
+	_for i _over change_set.fast_elements()
+	_loop
+	
+		name <<   i.current_record.source_collection.name
+	
+		_if object_filtered.includes?(name) _isnt _true  
+		_then 				
+			_continue
+		_else
+		#	hub << "hub_" + i.current_record.id.write_string		
+		#	obj_coll << property_list.new_with(hub.as_symbol(), rope.new())			
+			jml_hub << 1
+			_if i.current_record.access_points.size = 1
+			_then
+				obj_tree.add({i.current_record, _false, i.current_record.name.write_string, equality_set.new(), _unset})
+				#obj_coll[hub.as_symbol()].add(i.current_record.access_points)
+			_else
+				write("Can't continue, Access point more than one objects")
+				_return 
+			_endif 
+		_endif 
+	
+	_endloop
+
+	_if jml_hub < 1
+	_then
+		write("No Hub detected!")
+		_return
+	_endif
+		
+	#get access point cables
+	ap << obj_tree[1][1].access_points	
+	#jumlah fibre
+	obj_tree[1][5] << ap.an_element().cables()[1].fiber_count.write_string
+	#fibre yang dicentang
+	obj_tree[1][4].add(fiber_number)
+
+
+	print(obj_tree[1])
+	
+	#lanjutkan ke pencarian pole pertama
+	object_filtered << rope.new_with(:pole)
+
+	_for i _over change_set.fast_elements()
+	_loop
+	
+		name <<   i.current_record.source_collection.name
+	
+		_if object_filtered.includes?(name) _isnt _true  
+		_then 				
+			_continue
+		_else			
+			_for j _over i.current_record.cables().fast_elements()
+			_loop
+				_if j = ap.an_element().cables()[1]
+				_then					
+					#search another desc core cable
+					_for k _over i.current_record.cables().fast_elements()
+					_loop
+						_if k <> ap.an_element().cables()[1]
+						_then
+							#get next cable spec
+							obj_tree.add({i.current_record, _false , rope.new(), equality_set.new(), k.spec_id.write_string})
+						
+						_endif 
+					_endloop 
+				_endif 
+			_endloop		
+		
+		_endif 
+	
+	_endloop
+
+
+	_return 
+######################	
+	#Detect which fiber number connected until ODP/ODC
+		
+	_for key, a_node _over a_nodes.fast_keys_and_elements()
+	_loop
+	
+		_try _with cond	
+		
+			_if a_node[1].in_node.owner.external_name = "Optical Splitter"
+			_then											
+			 
+				sc << a_node[1].in_node.owner.sheath_splice
+				#write("OPTICAL SPLITTER")
+				#write("Spec SP : ",sc.spec_id)
+				
+				write(sc)
+
+				#type splitter
+				sp_model << a_node[1].in_node.owner.ports()[1].get_model()
+
+				write(sp_model)
+				#write("Structure SP : ",sc.get_structure())
+				#write("------------")
+				#Cheking is the pole already inside rope ?
+				#	_loop
+					count << 0
+					_for i _over obj_tree.fast_elements()
+					_loop
+				
+						_if i[1] = sc.get_structure()
+						_then
+							count << 1
+							#obj_tree[i][3][3].add()
+							_continue 							
+							#obj_tree.add({sc.get_structure(), _true  , rope.new_with({sp_model, _unset, rope.new()}), equality_set.new(), _unset })
+						_endif 
+					_endloop
+					
+					_if count = 0
+					_then
+						obj_tree.add({sc.get_structure(), _true  , rope.new_with({sp_model, _unset, rope.new()}), equality_set.new(), _unset })
+						count << 3					
+					_endif
+					print(obj_tree[3])
+					count << 3
+					_if count = 3 _then _leave _endif 
+					
+				#_endloop 
+			 
+			_else
+					
+				#Detecting Fiber connections
+
+				_if ap.an_element().cables()[1] = a_node[1].in_node.owner
+				_then
+					obj_tree[1][4].add(a_node[1].in_node.fiber_number)
+				
+				_endif 
+				#write(ap.an_element().cables()[1], "--", a_node[1].in_node.owner)
+				write("fiber num: ", a_node[1].in_node.fiber_number)
+				
+				#write(a_node[1].in_node.top_housing.external_name," ",a_node[1].in_node.top_housing.name)
+				#write(a_node[1].in_node.connection_records)
+					
+			
+				#sc << a_node[1].in_node.owner
+				#write(sc.ap("get"))
+				
+				#write("kabel no splitter : ", key.owner.spec_id)
+				#write(a_node[1].in_node.owner.get_fiber_count())
+				#write(a_node[1].in_node.get_connected_equipment()) #ap(""))
+			#	write(a_node[1].in_node.owner.ap("get"))
+				#write("Structure SP : ",sc.get_structure().an_element())
+				#write(key.ap("structure"))
+#				print(key.owner.structure_path)
+#				#_for i _over a_node[1].in_node.owner.structures()
+#				#_loop
+#				#	write(i)
+#				#_endloop 
+#				#write("stucture : ", key.owner.get_structure())
+#				_return 
+				#write(key.fiber_number)
+				#	write("SHEATH SPLICE")
+				#sc << a_node[1].in_node.owner.sheath_splice
+				#write("Spec SC : ",sc.spec_id)
+				#_return  
+			_endif 
+			
+			#write(a_node[1].in_node)
+			#	print(key.get_all_spec_records())
+			#write(key.get_mapped_physical_range())
+      
+		_when does_not_understand
+		#	write("fiber : - ")
+			_continue
+		_when index_out_of_bounds
+			_continue 
+		_endtry 
+			
+		
+	_endloop
+
+	write(obj_tree.size)
+	
+	_for i _over obj_tree.fast_elements()
+	_loop
+		print(i)
+	_endloop
+		
+	_return
+		
+	_for a_node _over a_nodes.fast_elements()
+	_loop
+		#print(a_node.key)
+		#write(a_node[2])
+		_if a_node[1] _isnt _unset 
+		_then
+			str << ""
+		#	write(a_node[1].in_node)
+			_if a_node[1].in_node.is_kind_of?(mit_rme_port)
+			_then 
+				str << a_node[1].in_node.top_housing.name
+				_if a_node[1].out_node.is_kind_of?(mit_rme_port)
+				_then 
+					str << str + " - " + a_node[1].out_node.top_housing.name
+				_endif	
+				#write (str)
+				#print(a_node[1])
+				#write(newline_char)				
+			_endif
+		_endif		
+	_endloop
+_endmethod
+$
+
+_pragma(classify_level=restricted, topic=mit_tracing, usage=internal)
+_method pni_trace_result_lister.rw_build_network_trace_path(a_start_node, all_the_nodes)
+
+## Build ordered list of traced objects from the start node to the end of trace 
+## a_start_node - start node
+## all_the_nodes - all visited nodes returned by the trace engine
+## return the property list containing ordered trace results
+## property list structure - TBD
+
+	l_network_path << property_list.new_with(:start_node, _unset, :racks, rope.new(),  :structure_data, rope.new())
+	build_tree_visited_links << equality_set.new()
+	display_string_method    << display_string_method.default(:write_string)
+	_global my_test 
+	my_test << a_start_node
+	to_do_nodes  << stack.new()
+	to_do_nodes.push(a_start_node)            #   sole initial node
+	l_vendor_order_no << "Test Product Number" # a_start_node.fiber_path.product_order_item.product_order.product_order_id.write_string.default("")
+	l_circuit_id << "Test Circuit Number" # a_start_node.fiber_path.product_order_item.service_id.write_string.default("")
+	l_network_path[:start_node] << a_start_node	
+	the_entry << all_the_nodes[a_start_node]
+
+	_local l_calc_dist, l_estim_dist, l_spliced	
+	l_spliced << _false
+	l_calc_dist<<0.0
+	l_estim_dist<<0.0	
+	_loop
+		_if to_do_nodes.empty?
+		_then
+			str << ""
+			_for th _over l_network_path[:racks].fast_elements()
+			_loop
+				_if th.top_housing.is_kind_of?(mit_hub)
+				_then
+					str << str + th.top_housing.name + " - "
+				_endif
+			_endloop
+		
+			_return l_network_path   #   no more nodes to check -- terminate loop
+		_endif
+
+		a_node    << to_do_nodes.pop()
+	
+		the_entry << all_the_nodes[a_node]
+		_if a_node.is_kind_of?(pole)
+		_then
+			write("Pole ", a_node)
+		_endif 
+		
+		_if a_node.is_kind_of?(mit_rme_port)
+		_then	
+			l_top_housing << a_node.get_bay().top_housing
+			l_network_path[:racks].add_last(a_node.get_bay())
+			
+			l_structure_data << property_list.new()
+			l_structure_data[:vendor] << "Test Demo Pty Ltd"
+			l_structure_data[:facility_provider] << l_top_housing.name
+			l_states_abbreviations << property_list.new_with(:|Bekasi|, "Kota Bekasi") 
+			#l_address << l_top_housing.street_number.write_string + " " + l_top_housing.street_name + " " +  l_top_housing.street_type + ", " + l_top_housing.suburb + " " + l_states_abbreviations[l_top_housing.state.as_symbol()].default(l_top_housing.state)
+		#	l_structure_data[:address] << l_address
+			# TOD - add coordinate transform
+			!print_float_precision! << 16
+		#	l_coord << l_top_housing.boundary.guaranteed_internal_point
+		#	l_coord << _self.rw_storage_to_wgs(l_coord)
+		#	l_structure_data[:lat_long] << "".concatenation(l_coord.y.write_string, %degree + " S, ", l_coord.x.write_string, %degree + " E")
+		
+			#l_structure_data[:level_sty] << "Level " + a_node.get_bay().mit_floor.name.write_string
+			l_rack << a_node.get_bay().mns_short_name #.split_by(%:).last		
+			#_if ~ (a_node.get_bay().mns_short_name = a_node.get_bay().mns_short_name.split_by(%:).last)
+			#_then
+			#	l_room << a_node.get_bay().mns_short_name.subseq(1, a_node.get_bay().mns_short_name.size - (a_node.get_bay().mns_short_name.split_by(%:).last.size + 1))
+			#_else
+			#	l_room << a_node.get_bay().mns_short_name.write_string
+			#_endif
+			#l_room << a_node.get_top_level_device().identifier.write_string
+			# l_structure_data[:room] << l_room
+			l_structure_data[:rack] << l_rack		
+			#check the case when Shelf is inside the other Shelf
+			#write(l_rack)
+			#write(a_node.mit_shelf.ne_name)
+			#	l_structure_data[:shelf] << a_node.mit_shelf.ne_name.write_string.subseq(l_rack.split_by(space_char)[1].size + 2, (a_node.mit_shelf.ne_name.size - l_rack.split_by(space_char)[1].size - 1))
+		
+			l_structure_data[:fiber_no] << a_node.description.write_string # to review for the Fibre number in Sheath with LOC		
+			l_structure_data[:fiber_type] << ""
+			l_structure_data[:connector_type] << a_node.connector_type.write_string
+			l_structure_data[:circuit_id] << l_circuit_id
+			l_structure_data[:vendor_order_no] << l_vendor_order_no
+			l_structure_data[:google_site_id] << ""
+		#	l_structure_data[:vendor_site_id] << l_top_housing.location_ref	
+			_if l_estim_dist > 0 _or l_calc_dist > 0
+			_then
+				#write("Clculated Distance is :" + (l_calc_dist.default(0.0) / 1000).write_string + " km")
+				#write("Estimated Distance is :" + (l_estim_dist.default(0.0) / 1000).write_string + " km")				
+				#write("Spliced: " + l_spliced.write_string)
+				_local l_conn_type
+				_if l_spliced 
+				_then
+					l_spliced << "Spliced"
+				_else
+					l_spliced << "Pre-term"
+				_endif
+				l_structure_data[:connection] << property_list.new_with(:estimated_dist, (l_estim_dist.default(0.0) / 1000).write_string, :measured_dist, (l_estim_dist.default(0.0) / 1000).write_string, :connection_type, l_spliced)	
+				l_spliced << _false
+				l_calc_dist<<0.0
+				l_estim_dist<<0.0
+			_endif
+			l_network_path[:structure_data].add_last(l_structure_data)
+		_else
+			#write("Link")
+			#print(a_node.sheath_pin.parent_cable())
+			_try _with a_cond
+				_if a_node.is_kind_of?(mit_pseudo_fiber_loc_pin)
+				_then
+					#write("Sheath Length")
+					#write(a_node.sheath_pin.sheath.length.value)
+					_if a_node.sheath_pin.sheath.calculated_length _isnt _unset
+					_then
+						l_calc_dist<< l_calc_dist + a_node.sheath_pin.sheath.calculated_length.value
+					_else
+						l_calc_dist<< l_calc_dist + a_node.sheath_pin.sheath.length.value	
+					_endif
+					_if a_node.sheath_pin.sheath.measured_length _isnt _unset
+					_then
+						l_estim_dist<< l_estim_dist + a_node.sheath_pin.sheath.measured_length.value
+					_else
+						l_estim_dist<< l_estim_dist + a_node.sheath_pin.sheath.length.value
+					_endif
+					(a_splices, a_conn) << a_node.sheath_pin.sheath.get_splices(:downstream)	
+					_if a_splices _isnt _unset _andif a_splices.size > 0
+					_then
+						l_spliced << _true
+					_endif
+				_else
+					write("Unmanaged Type")
+					print(a_node)
+				_endif
+			_when error
+				write(a_cond)
+			_endtry
+		_endif	
+
+		_if the_entry _is _unset
+		_then
+			_continue
+		_endif
+
+		next_links  << the_entry[2]
+
+		_for next_link _over next_links.fast_elements()
+		_loop
+			_if build_tree_visited_links.includes?(next_link)
+			_then
+				# avoid going through link twice
+				_continue
+			_endif
+		#	write("Next Link")
+		#	print(next_link)
+			# place link in list to keep track whether it has been visited
+			# (used in the check above!)
+			build_tree_visited_links.add(next_link)
+			to_do_nodes.push(next_link.out_node)
+			object_data << next_link.out_node   #  might be _unset
+			#write("Out Node")
+			#print(object_data)
+				#
+				#   Information may be available to enhance the 'beyond' message by
+				#   appending details of the object upon which we have done our
+				#   going-beyond, which may be a cable or an underground/aerial
+				#   route:
+				#
+				nll << next_link.link
+				#write("Next Link Link")
+				#print(nll)
+				_if nll.mit_responds_to?(:top_level_link)
+				_then
+
+				_elif nll.is_kind_of?(pseudo_link)
+				_then
+		 
+				_endif
+		_endloop
+	_endloop
+_endmethod
+$
+
+_pragma(classify_level=restricted,topic=pni_tracing_plugin)
+_method pni_trace_result_lister.rw_write_trace_diagram(a_report_data)
+
+	## Write Trace Diagram report in Excel format
+	## Input a_report_data (hash_table) with a traced data results used by report structure
+	## Output Excel file based of Template - name TBD
+        port_counts << a_report_data.size
+		_global my_report
+		my_report << a_report_data
+		_if a_report_data.size > 1
+		_then
+		_if a_report_data[1][:racks] _isnt _unset _andif ~a_report_data[1][:racks].eq?(a_report_data[2][:racks])
+		_then
+			write("The selected fibres are not belong to the same Racks!")
+			_return
+		_endif
+		_endif 
+		l_records_count << 1 
+			_for struct _over a_report_data[1][:structure_data].fast_elements()
+			_loop
+				# write("#####################################")
+				# write("Vendor: " + struct[:vendor])
+				# write("Facility Provider: " + struct[:facility_provider])
+				# write("Address: " + struct[:address])
+				# write("Lat/ Long: " + struct[:lat_long])
+				# write("Level/ Sty: " + struct[:level_sty])
+				# write("Room: " + struct[:room])
+				 write("Rack: " + struct[:rack])
+				# write("Shelf: " + struct[:shelf])
+				# struct[:fiber_no] << struct[:fiber_no]	+ " & " + 	a_report_data[2][:structure_data][l_records_count][:fiber_no].write_string
+				# write("Fiber No: " + struct[:fiber_no])	# + " & " + 	a_report_data[2][:structure_data][l_records_count][:fiber_no].write_string)
+				# write("Fiber Type: " + struct[:fiber_type])
+				# write("Connector Type: " + struct[:connector_type])
+				# write("Circuit ID: " + struct[:circuit_id])
+				# write("Vendor Order No: " + struct[:vendor_order_no])
+				# write("Google Site ID: " + struct[:google_site_id])
+				# write("Vendor Site ID: " + struct[:vendor_site_id])		
+				# write("#####################################")	
+				# write(newline_char)
+				l_records_count << l_records_count + 1
+			_endloop
+		_local report_writer << rw_trace_path_report.new(a_report_data[1][:structure_data])
+		write("test.magik")
+		report_writer.write_report_data()		
+_endmethod
+$
+
+_pragma(classify_level=restricted,topic=pni_tracing_plugin)
+_method pni_trace_result_lister.rw_storage_to_wgs(a_coord)
+	_local l_coord
+	_local l_cs_transform
+	_local from_cs, to_cs, l_view
+	l_view << gis_program_manager.cached_dataset(:gis)
+	from_cs << l_view.world.coordinate_system
+	to_cs << l_view.coordinate_system(:uk_british_national_grid_mm)
+#	to_cs << l_view.coordinate_system(:australia_gda94_longlat_degree)
+	_local cs_transform << transform.new_converting_cs_to_cs(from_cs, to_cs) 
+	_return a_coord.transformed(cs_transform)
+_endmethod
+$

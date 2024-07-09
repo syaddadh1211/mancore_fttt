@@ -1,0 +1,1587 @@
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_att, :span_name, :span_name|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_pole, :span_sum_pole|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_odp, :span_sum_odp|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_otb, :span_sum_otb|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_closure, :span_sum_closure|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_slack, :span_sum_slack|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_cable, :span_sum_cable|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_manhole, :span_sum_manhole|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_handhole, :span_sum_handhole|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_pole_exist, :span_sum_pole_exist|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_closure_exist, :span_sum_closure_exist|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :span_summary, :span_sum_cable_exist, :span_sum_cable_exist|()| )
+$
+
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_att, :ring_span_name, :ring_span_name|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_pole, :ring_sum_pole|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_odp, :ring_sum_odp|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_otb, :ring_sum_otb|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_closure, :ring_sum_closure|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_slack, :ring_sum_slack|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_cable, :ring_sum_cable|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_manhole, :ring_sum_manhole|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_handhole, :ring_sum_handhole|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_pole_exist, :ring_sum_pole_exist|()| )
+$
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_closure_exist, :ring_sum_closure_exist|()| )
+$				
+custom_textbox_layout_element.add_category_type_configuration ( 
+                :ring_summary, :ring_sum_cable_exist, :ring_sum_cable_exist|()| )
+$
+
+_method custom_textbox_layout_element.span_name()	
+
+	>> _self.tampung[:span_name]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_pole()	
+	>> _self.tampung[:span_sum_pole]
+	
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_odp()	
+	>> _self.tampung[:span_sum_odp]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_otb()	
+	>> _self.tampung[:span_sum_otb]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_closure()	
+	>> _self.tampung[:span_sum_closure]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_slack()	
+	>> _self.tampung[:span_sum_slack]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_cable()	
+	>> _self.tampung[:span_sum_cable]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_manhole()	
+	>> _self.tampung[:span_sum_manhole]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_handhole()	
+	>> _self.tampung[:span_sum_handhole]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_pole_exist()	
+	>> _self.tampung[:span_sum_pole_exist]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_closure_exist()	
+	>> _self.tampung[:span_sum_closure_exist]
+_endmethod
+$
+_method custom_textbox_layout_element.span_sum_cable_exist()	
+	>> _self.tampung[:span_sum_cable_exist]
+_endmethod
+$
+
+_method custom_textbox_layout_element.ring_span_name()		
+	#	spans_name << "List of Span: " + newline_char
+
+	#   _for i _over _self.tampung[:ring_span_name].fast_elements()
+	#   _loop 
+	#   	 spans_name << spans_name + " " + i.default("") + newline_char
+	#   _endloop 
+
+	#>> spans_name
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_pole()	
+	>> _self.tampung[:ring_sum_pole]
+	
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_odp()	
+	>> _self.tampung[:ring_sum_odp]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_otb()	
+	>> _self.tampung[:ring_sum_otb]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_closure()	
+	>> _self.tampung[:ring_sum_closure]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_slack()	
+	>> _self.tampung[:ring_sum_slack]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_cable()	
+	>> _self.tampung[:ring_sum_cable]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_manhole()	
+	>> _self.tampung[:ring_sum_manhole]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_handhole()	
+	>> _self.tampung[:ring_sum_handhole]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_pole_exist()	
+	>> _self.tampung[:ring_sum_pole_exist]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_closure_exist()	
+	>> _self.tampung[:ring_sum_closure_exist]
+_endmethod
+$
+_method custom_textbox_layout_element.ring_sum_cable_exist()	
+	>> _self.tampung[:ring_sum_cable_exist]
+_endmethod
+$
+
+custom_textbox_layout_element.define_shared_variable ( :tampung, property_list.new_with(:span_name, _unset,
+					:span_sum_pole, 0, :span_sum_odp, 0, :span_sum_otb, 0, :span_sum_closure, 0, :span_sum_slack, 0, :span_sum_cable, 0 , :span_sum_manhole, 0, :span_sum_handhole, 0,
+					:span_sum_pole_exist, 0, :span_sum_closure_exist, 0, :span_sum_cable_exist, 0, :ring_span_name, rope.new(), :ring_sum_pole, 0, :ring_sum_odp, 0, :ring_sum_otb, 0, :ring_sum_closure, 0 , :ring_sum_slack, 0,
+					:ring_sum_cable, 0, :ring_sum_manhole, 0, :ring_sum_handhole, 0 , :ring_sum_pole_exist, 0, :ring_sum_closure_exist, 0, :ring_sum_cable_exist, 0), :public )
+$
+_method rwwi_apd_tools_dialog.populate_ur1( a_table )
+	## 
+	##
+
+	_if .items[:ur1].value ="FTTT" _then 
+		row << 1
+
+		a_table.add_cell( 1, 1, {}, {:label, "Pole" })
+		pl_pole << _self.get_data_pole()
+		a_table.add_cell( 1, 2, {}, {:label, pl_pole.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_pole] << pl_pole.size.default(0)
+		
+		a_table.add_cell( 2, 1, {}, {:label, "ODP" })
+		pl_odp << _self.get_data_odp()
+		a_table.add_cell( 2, 2, {}, {:label, pl_odp.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_odp] << pl_odp.size.default(0)
+	
+		a_table.add_cell( 3, 1, {}, {:label, "OTB" })
+		pl_otb << _self.get_data_otb()
+		a_table.add_cell( 3, 2, {}, {:label, pl_otb.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_otb] << pl_otb.size.default(0)
+	
+		#a_table.add_cell( 3, 2, {}, {:label, "0" })
+		a_table.add_cell( 4, 1, {}, {:label, "Closure" })
+		pl_closure << _self.get_data_closure()	
+		a_table.add_cell( 4, 2, {}, {:label, pl_closure.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_closure] << pl_closure.size.default(0)
+		
+		a_table.add_cell( 5, 1, {}, {:label, "Slack" })
+		pl_slack << _self.get_data_slack()
+		a_table.add_cell( 5, 2, {}, {:label, pl_slack.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_slack] << pl_slack.size.default(0)
+		
+		a_table.add_cell( 6, 1, {}, {:label, "Cable" })
+		pl_swl << _self.get_data_swl_l()
+		l_swl << pl_swl.write_string+"   m"
+		a_table.add_cell( 6, 2, {}, {:label, l_swl })
+		
+		#custom_textbox_layout_element.tampung[:ring_span_name].empty()
+		#_for i _over _self.get_data_swl().fast_elements()
+		#_loop 
+		#      custom_textbox_layout_element.tampung[:ring_span_name].add(i.name)
+		#_endloop 
+		custom_textbox_layout_element.tampung[:ring_sum_cable] << pl_swl.default(0)
+		
+		a_table.add_cell( 7, 1, {}, {:label, "Manhole" })
+		pl_mh << _self.get_data_manhole()	
+		a_table.add_cell( 7, 2, {}, {:label, pl_mh.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_manhole] << pl_mh.size.default(0)
+		
+		a_table.add_cell( 8, 1, {}, {:label, "Handhole" })
+		pl_hh << _self.get_data_handhole()	
+		a_table.add_cell( 8, 2, {}, {:label, pl_hh.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_handhole] << pl_hh.size.default(0)
+		
+		a_table.add_cell( 9, 1, {}, {:label, "Pole Existing" })
+		pl_pole << _self.get_data_pole_existing()
+		a_table.add_cell( 9, 2, {}, {:label, pl_pole.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_pole_exist] << pl_pole.size.default(0)
+		
+#		a_table.add_cell( 10, 1, {}, {:label, "ODP Existing" })
+#		pl_odp << _self.get_data_odp()
+#		a_table.add_cell( 2, 2, {}, {:label, pl_odp.size.write_string })
+#	
+#		a_table.add_cell( 10, 1, {}, {:label, "OTB Existing" })
+#		pl_otb << _self.get_data_otb()
+#		a_table.add_cell( 3, 2, {}, {:label, pl_otb.size.write_string })
+#	
+		#a_table.add_cell( 3, 2, {}, {:label, "0" })
+		a_table.add_cell( 11, 1, {}, {:label, "Closure Existing" })
+		pl_closure << _self.get_data_closure_existing()	
+		a_table.add_cell( 11, 2, {}, {:label, pl_closure.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_closure_exist] << pl_closure.size.default(0)
+		
+#		a_table.add_cell( 12, 1, {}, {:label, "Slack Existing" })
+#		pl_slack << _self.get_data_slack()
+#		a_table.add_cell( 12, 2, {}, {:label, pl_slack.size.write_string })
+				
+		a_table.add_cell( 13, 1, {}, {:label, "Cable Existing" })
+		pl_swl << _self.get_data_swl_l_existing()
+		l_swl << pl_swl.write_string+"   m"
+		a_table.add_cell( 13, 2, {}, {:label, l_swl })
+		custom_textbox_layout_element.tampung[:ring_sum_cable_exist] << pl_swl.default(0)
+		
+#		a_table.add_cell( 14, 1, {}, {:label, "Manhole Existing" })
+#		pl_mh << _self.get_data_manhole()	
+#		a_table.add_cell( 14, 2, {}, {:label, pl_mh.size.write_string })
+#
+#		a_table.add_cell( 15, 1, {}, {:label, "Handhole Existing" })
+#		pl_hh << _self.get_data_handhole()	
+#		a_table.add_cell( 15, 2, {}, {:label, pl_hh.size.write_string })
+
+
+		
+
+	_else
+		a_table.add_cell( 1, 1, {}, {:label, "Pole" })
+		pl_pole << _self.get_data_pole()
+		a_table.add_cell( 1, 2, {}, {:label, pl_pole.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_pole] << pl_pole.size.default(0)
+		
+		a_table.add_cell( 2, 1, {}, {:label, "ODP" })
+		pl_odp << _self.get_data_odp()
+		a_table.add_cell( 2, 2, {}, {:label, pl_odp.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_odp] << pl_odp.size.default(0)
+		
+		a_table.add_cell( 3, 1, {}, {:label, "OTB" })
+		pl_otb << _self.get_data_otb()
+		a_table.add_cell( 3, 2, {}, {:label, pl_otb.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_otb] << pl_otb.size.default(0)
+		
+		#a_table.add_cell( 3, 2, {}, {:label, "0" })
+		a_table.add_cell( 4, 1, {}, {:label, "Closure" })
+		pl_closure << _self.get_data_closure()	
+		a_table.add_cell( 4, 2, {}, {:label, pl_closure.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_closure] << pl_closure.size.default(0)
+		
+		a_table.add_cell( 5, 1, {}, {:label, "Slack" })
+		pl_slack << _self.get_data_slack()
+		a_table.add_cell( 5, 2, {}, {:label, pl_slack.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_slack] << pl_slack.size.default(0)
+		
+		a_table.add_cell( 6, 1, {}, {:label, "Cable" })
+		pl_swl << _self.get_data_swl_l()
+		l_swl << pl_swl.write_string+"   m"
+		a_table.add_cell( 6, 2, {}, {:label, l_swl })		
+		print(_self.get_data_swl())
+		
+		a_table.add_cell( 7, 1, {}, {:label, "Manhole" })
+		pl_mh << _self.get_data_manhole()	
+		a_table.add_cell( 7, 2, {}, {:label, pl_mh.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_manhole] << pl_mh.size.default(0)
+		
+		a_table.add_cell( 8, 1, {}, {:label, "Handhole" })
+		pl_hh << _self.get_data_handhole()	
+		a_table.add_cell( 8, 2, {}, {:label, pl_hh.size.write_string })
+		custom_textbox_layout_element.tampung[:ring_sum_handhole] << pl_hh.size.default(0)
+		
+		a_table.add_cell( 9, 1, {}, {:label, "Homepass" })
+		pl_mh << _self.get_data_homepass()	
+		a_table.add_cell( 9, 2, {}, {:label, pl_mh.size.write_string })
+
+		a_table.add_cell( 10, 1, {}, {:label, "Homepass Boundary" })
+		pl_hh << _self.get_data_cell()	
+		a_table.add_cell( 10, 2, {}, {:label, pl_hh.size.write_string })
+
+		a_table.add_cell( 11, 1, {}, {:label, "SH" })
+		pl_odp << _self.get_data_sh()
+		a_table.add_cell( 11, 2, {}, {:label, pl_odp.size.write_string })
+	
+		a_table.add_cell( 12, 1, {}, {:label, "MS" })
+		pl_otb << _self.get_data_ms()
+		a_table.add_cell( 12, 2, {}, {:label, pl_otb.size.write_string })
+
+		a_table.add_cell( 13, 1, {}, {:label, "ODC" })
+		pl_odc << _self.get_data_odc()
+		a_table.add_cell( 13, 2, {}, {:label, pl_odc.size.write_string })
+		
+
+	_endif 
+
+	#_for a_rec  _over .table_list.fast_elements()
+	#_loop
+	#	a_table.set_row_data( row, a_rec )
+	#	a_table.add_cell( row, 1, {}, {:label, a_rec.external_name })
+	#	a_table.add_cell( row, 2, {}, {:label, a_rec.id })
+	#	row +<< 1
+	#_endloop
+_endmethod
+$
+_method rwwi_apd_tools_dialog.clear()
+	## 
+	## 
+
+
+	.table_list.empty()
+	.table_list2.empty()
+	_self.changed(:table_ur1, :refresh)
+	_self.changed(:table_ur2, :refresh)
+	.records.empty()
+	#.current_selection_ur1 << _unset 
+	#.current_selection_ur2 << _unset 
+	
+	#.items[:result].text << ""
+
+	#.items[:ur1].text_items << {{:ur1,"Underground Route 1"}}
+	#.items[:ur2].text_items << {{:ur2,"Underground Route 2"}}
+	#.items[:add_ur1].enabled? << _true
+	#.items[:add_ur2].enabled? << _false
+	#.items[:run_check].enabled? << _true
+	
+	.items[:run_check].enabled? << _false
+	.items[:rpt_1].enabled? << _false
+	.items[:rpt_2].enabled? << _false
+	.items[:rpt_3].enabled? << _false
+	.items[:file_txt].value << ""
+	a_table << .items[:table]
+	#	.items[:table].clear_row_data()
+	
+	custom_textbox_layout_element.tampung[:ring_span_name].empty()
+	custom_textbox_layout_element.tampung[:ring_sum_pole] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_odp] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_otb] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_closure] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_slack] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_cable] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_manhole] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_handhole] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_pole_exist] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_closure_exist] << 0
+	custom_textbox_layout_element.tampung[:ring_sum_cable_exist] << 0	
+	
+	_self.populate_ur1_clear(a_table)
+	
+_endmethod
+$
+_method rwwi_apd_tools_dialog.get_data_swl_l()
+
+	swl << _self.get_data_swl()
+	lh << 0
+	a_ff << float_format.new_with_properties(
+			      :float_format,:fixed,
+			      :float_decimal_places,3)
+
+	_for l _over swl.fast_elements()
+	_loop  	    
+		_if l.sag _isnt _unset 
+		_then 			  
+		      j << l.calculated_sheath_length.value_in(:m).as_number() + (l.calculated_sheath_length.value_in(:m).as_number() * (l.sag.as_number()/100))
+		      lh << j+lh
+		_endif 
+	_endloop
+	
+	>> a_ff.format(lh) #.value_in(:m).print_string
+
+_endmethod
+$
+_method rwwi_apd_tools_dialog.cek_design_core()
+
+
+#_global cek_design_core << _proc ()
+
+				
+			s << swg_dsn_admin_engine.get_current_job()
+
+			_if s _is _unset
+			_then
+				write("No Design Selected")
+				_leave 
+			_endif
+
+
+			id << s.id.write_string 
+			nama << s.name.write_string
+			owner << s.owner.write_string
+			pj << s.inf_project.write_string
+			st << s.status.write_string	
+			change_set << mit_scheme_record_change_set.new(s)
+			
+	#		dm << gis_program_manager.databases[:design_admin]
+	#		val << s.inf_project.write_string
+	#		c << dm.collections[:swg_dsn_project].select(predicate.eq(:name,val))
+	#		cur_rec << c.an_element()
+	#		project_id << cur_rec.id.write_string 
+	#		owner << s.owner.write_string
+			#write(project_id,nama)
+
+			#ignored except these object
+			object_filtered << rope.new_with(:pole,:figure_eight,:sheath_splice,:sheath_with_loc, :mit_terminal_enclosure, :uub, :optical_splitter )
+					
+			  
+			#pake equality ->string sebagai key
+			obj << equality_hash_table.new()
+			
+			start << date_time_now()
+			
+			_for i _over change_set.fast_elements()
+			_loop
+				
+				name <<   i.current_record.source_collection.name
+			
+				_if object_filtered.includes?(name) _isnt _true  
+				_then 				
+					_continue
+				_else				
+					_try			
+						x << i.current_record.stf_item_code.write_string
+						
+						_if name _is :sheath_with_loc
+						_then 
+							_if i.current_record.sag _isnt _unset 
+							_then
+								_if obj[x] _isnt _unset  
+								_then 					
+													    
+									obj[x] << obj[x] + (i.current_record.calculated_sheath_length.value_in(:m).as_number() + (i.current_record.calculated_sheath_length.value_in(:m).as_number() * (i.current_record.sag.as_number()/100)))
+								_else							
+									obj[x] << i.current_record.calculated_sheath_length.value_in(:m).as_number() + (i.current_record.calculated_sheath_length.value_in(:m).as_number() * (i.current_record.sag.as_number()/100))
+								_endif
+							_endif
+						_else
+							_if obj[x] _isnt _unset  
+							_then 						      
+								obj[x] << obj[x] + 1
+							_else							
+								obj[x] << 1
+							_endif
+						_endif 
+					_when does_not_understand
+						write(i.current_record)
+					_endtry
+					
+				_endif 					
+			
+			_endloop
+
+			a_filename << "C:\template_boq\BOQ Estimate PT. Sokka Tama Fiber  V.1 Sewa Core.xlsx"
+	
+			Excel_Object << OLE_Client.Create_Object("Excel.Application")
+			Excel_Object.Visible << _True
+
+			Workbooks << Excel_Object.Workbooks ()
+			WorkBook << Workbooks.add(a_filename) 			
+			Sheet << Excel_Object.Sheets ("Sheet1")
+	
+			a_ff << float_format.new_with_properties(
+			      :float_format,:fixed,
+			      :float_decimal_places,3)
+				  
+			start << date_time_now()
+
+			#ignored these lines
+			line_filtered << rope.new_with(19,29,30,31,104,105,106,111,112,113,175,176,177,189,190,191)		
+			
+			pole7m_jml << 0
+			pole9m_jml << 0			
+			
+			# Nama Project
+			Cell_pj_name << Sheet.Range("C9")
+			Cell_pj_name.value << pj
+			
+			_for key,value _over obj.keys_and_elements()
+			_loop  					
+			       _for j _over range (19,211)
+			        _loop				
+		
+					_if line_filtered.includes?(j) _isnt _true  
+					_then	
+						Cell_c << Sheet.Range ("C"+j.print_string)
+						Cell_f << Sheet.Range ("F"+j.print_string)		
+						#cell_e.value << "test"
+						_if cell_c.value _is _unset _then _continue _endif 
+						_if (Cell_c.value.trim_spaces().write_string = key) 
+						_then		
+							_if key = ":sheath_with_loc"
+							_then
+								write("cable : ", value)
+								Cell_f.value << a_ff.format(value) 
+							_else
+								Cell_f.value << value
+							_endif
+						_endif 
+					_else
+						_continue
+					_endif	
+				_endloop			
+				
+			_endloop
+			# Jumlah Tiang 7m, 9m dan panjang Kabel
+				cell_7m_1 << Sheet.Range("F47")
+				pole7m_jml << pole7m_jml + cell_7m_1.value.as_number()
+				cell_7m_2 << Sheet.Range("F48")
+				pole7m_jml << pole7m_jml + cell_7m_2.value.as_number()
+				cell_7m_3 << Sheet.Range("F49")
+				cell_7m_3 << Sheet.Range("F49")
+				pole7m_jml << pole7m_jml + cell_7m_3.value.as_number()			
+				Cell_pole7m << Sheet.Range("C13")				
+				Cell_pole7m.value << pole7m_jml
+				
+				cell_9m_1 << Sheet.Range("F50")
+				pole9m_jml << pole9m_jml + cell_9m_1.value.as_number()
+				cell_9m_2 << Sheet.Range("F51")
+				pole9m_jml << pole9m_jml + cell_9m_2.value.as_number()
+						
+				Cell_pole9m << Sheet.Range("C14")				
+				Cell_pole9m.value << pole9m_jml
+				
+				Cell_pole9m << Sheet.Range("C14")
+#				Cell_pole9m.value << pole9m_jml
+				Cell_sheathAll << Sheet.Range("C15")
+				Cell_sheathAll.value << _self.get_data_swl_l()
+				Cell_closure << Sheet.Range("C16")
+				Cell_closure.value << _self.get_data_closure().size
+				
+			write("Finish :", date_time_now() - start)
+_endmethod
+$
+_method rwwi_apd_tools_dialog.cek_design_capacity()
+
+	s << swg_dsn_admin_engine.get_current_job()
+
+	_if s _is _unset
+	_then
+		write("No Design Selected")
+		_leave 
+	_endif
+
+	id << s.id.write_string 
+	nama << s.name.write_string
+	owner << s.owner.write_string
+	pj << s.inf_project.write_string
+	st << s.status.write_string	
+
+	change_set << mit_scheme_record_change_set.new(s)
+
+	#From hub -> access point (detect cables) connect to poles
+	# until ODP/ODC
+		
+	object_filtered << rope.new_with(:mit_hub) # :optical_splitter, :mit_hub)
+	jml_hub << 0
+	
+	obj_tree << rope.new()
+
+	_for i _over change_set.fast_elements()
+	_loop
+	
+		name <<   i.current_record.source_collection.name
+	
+		_if object_filtered.includes?(name) _isnt _true  
+		_then 				
+			_continue
+		_else
+		#	hub << "hub_" + i.current_record.id.write_string		
+		#	obj_coll << property_list.new_with(hub.as_symbol(), rope.new())			
+			jml_hub << 1
+			_if i.current_record.access_points.size = 1
+			_then
+				obj_tree.add({i.current_record, _false, i.current_record.name.write_string, equality_set.new(), _unset})
+				#obj_coll[hub.as_symbol()].add(i.current_record.access_points)
+			_else
+				write("Can't continue, Access point more than one objects")
+				_return 
+			_endif 
+		_endif 
+	
+	_endloop
+
+	_if jml_hub < 1
+	_then
+		write("No Hub detected!")
+		_return
+	_endif
+		
+	#get access point cables
+	ap << obj_tree[1][1].access_points	
+	#jumlah fibre
+	obj_tree[1][5] << ap.an_element().cables()[1].fiber_count.write_string
+	#fibre yang dicentang
+	#obj_tree[1][4].add(fiber_number)
+
+	write( ap.an_element().cables()[1].ap("start"))
+	print(obj_tree[1])
+
+	_return
+			
+			s << swg_dsn_admin_engine.get_current_job()
+
+			_if s _is _unset
+			_then
+				write("No Design Selected")
+				_leave 
+			_endif
+
+
+			id << s.id.write_string 
+			nama << s.name.write_string
+			owner << s.owner.write_string
+			pj << s.inf_project.write_string
+			st << s.status.write_string	
+			change_set << mit_scheme_record_change_set.new(s)
+			
+	#		dm << gis_program_manager.databases[:design_admin]
+	#		val << s.inf_project.write_string
+	#		c << dm.collections[:swg_dsn_project].select(predicate.eq(:name,val))
+	#		cur_rec << c.an_element()
+	#		project_id << cur_rec.id.write_string 
+	#		owner << s.owner.write_string
+	# 		write(project_id,nama)
+
+			#ignored except these object
+			object_filtered << rope.new_with(:pole,:figure_eight,:sheath_splice,:sheath_with_loc, :mit_terminal_enclosure, :uub, :optical_splitter)
+			#pake equality ->string sebagai key
+			obj << equality_hash_table.new()
+			
+			start << date_time_now()
+		
+			_for i _over change_set.fast_elements()
+			_loop
+				
+				name <<   i.current_record.source_collection.name
+			
+				_if object_filtered.includes?(name) _isnt _true  
+				_then 				
+					_continue
+				_else				
+					_try			
+						x << i.current_record.stf_item_code.write_string
+						
+						_if name _is :sheath_with_loc
+						_then 
+							_if i.current_record.sag _isnt _unset 
+							_then
+								_if obj[x] _isnt _unset  
+								_then 						      
+									obj[x] << obj[x] + (i.current_record.calculated_sheath_length.value_in(:m).as_number() + (i.current_record.calculated_sheath_length.value_in(:m).as_number() * (i.current_record.sag.as_number()/100)))
+								_else							
+									obj[x] << i.current_record.calculated_sheath_length.value_in(:m).as_number() + (i.current_record.calculated_sheath_length.value_in(:m).as_number() * (i.current_record.sag.as_number()/100))
+								_endif
+							_endif
+						_else
+						
+							_if obj[x] _isnt _unset  
+							_then 						      
+								obj[x] << obj[x] + 1
+							_else							
+								obj[x] << 1
+							_endif
+						_endif 
+					_when does_not_understand
+						write(i.current_record)
+					_endtry
+					
+				_endif 					
+			
+			_endloop
+
+			a_filename << "C:\template_boq\BOQ Estimate PT. Sokka Tama Fiber  V.1 Sewa Capacity.xlsx"
+	
+			Excel_Object << OLE_Client.Create_Object("Excel.Application")
+			Excel_Object.Visible << _True
+
+			Workbooks << Excel_Object.Workbooks ()
+			WorkBook << Workbooks.add(a_filename) 			
+			Sheet << Excel_Object.Sheets ("BOQ FTTX")
+
+			Cell_pj_name << Sheet.Range("B7")
+			Cell_dsn_name << Sheet.Range("B9")
+			Cell_pj_name.value << pj
+			Cell_dsn_name.value << nama
+
+			a_ff << float_format.new_with_properties(
+			      :float_format,:fixed,
+			      :float_decimal_places,3)
+
+			#ignored these lines
+			line_filtered << rope.new_with(14,57,58,59,75,76,77,91,92,93,106,107,108,162,163,164,217,218,219)
+			
+			_for key,value _over obj.keys_and_elements()
+			_loop  					
+			       _for j _over range (14,221)
+			        _loop				
+		
+					_if line_filtered.includes?(j) _isnt _true  
+					_then	
+						Cell_b << Sheet.Range ("B"+j.print_string)
+						Cell_e << Sheet.Range ("E"+j.print_string)		
+						#cell_e.value << "test"
+						
+						_if Cell_b.value _is _unset _then _continue _endif
+						
+						_if (Cell_b.value.trim_spaces().write_string = key) 
+						_then				
+							_if key = ":sheath_with_loc"
+							_then
+								Cell_e.value << a_ff.format(value) 
+							_else
+								Cell_e.value << value
+							_endif
+						_endif 
+					_else
+						_continue
+					_endif	
+				_endloop
+			_endloop
+			write("Finished :", date_time_now() - start)
+	
+#	_endproc
+	
+_endmethod
+$
+
+#structure data :
+################
+
+        #obj_tree << rope.new()
+	
+	#looping sampe tower terakhir
+	
+#	for tower until last_tower
+		
+		#cari sheath mana yang fist coord nya within tower   
+		#cari OTB yang dilewati sheath diatas 				
+		#cari switch panel dari OTB diatas, ambil data fiber in dan fiber out nya  
+				
+			# masukkan data dengan format dibawah ini:
+			# obj_tree.add({tower.name, OTB Spec, OTB name, OTB coord, OTB fiber count, fiber in, fiber out, Sheath LOC spec in })
+			
+		#Khusus kabel yang nyambung di OTB
+		
+		#dari kabel yang terkoneksi pada OTB, looping cari kabel yang terkoneksi ke kabel selanjutnya, bandingkan mulai kabel pertama diatas dengan data list sheath loc		
+			# jika last coord kabel pertama = first coord kabel berikutnya maka itu adalah sambungannya, simpan sheath loc sambungan
+			# Checking jika ada kabel bolak-balik OTB ke ODP dan ODP ke OTB
+			# dimana last coord nya pasti = first coord juga sebaliknya
+
+			# Cari pada list sheath splice, adakah ODP/Closure yang terkoneksi dengan last coord kabel pertama				
+				#yes, simpan di obj_tree
+			# Cari pada list OTB, adakah OTB yang terkoneksi dengan last coord kabel pertama
+				#yes, kontinue next tower
+				#no, kontinue next kabel
+			
+		#lanjut ke next kabel sampe ketemu next OTB
+
+		# looping selama belum ketemu next OTB
+			# Cari pada list sheath splice, adakah ODP/Closure yang terkoneksi dengan last coord kabel sambungan
+				# yes, simpan di obj_tree			
+				# Cari pada list OTB, kalo terhubung maka 
+				# yes, simpan di obj_tree
+				# exit loop, lanjut next tower			
+				# kalo tidak ketemu OTB berarti masih lanjut 
+			# simpan di obj_tree, cari pada list sheath splice,
+			#adakah ODP/Closure yang terkoneksi dengan last coord kabel sambungan kalo tidak ada maka simpan next kabel, lanjut looping
+			# kalo ketemu ODP/Closure lanjut looping 
+		# until OTB berikutnya	
+	end for
+# Catatan Possibly trouble:
+#	Ada dua/lebih kabel yang (bercabang) dimana last cord dari current cablenya = first coord next cable 
+#	solusinya pake filter nama kabel (penamaan kabel menjadi penting selain untuk mempermudah pembacaaan juga untuk mempermudah tracing)
+	
+_method rwwi_apd_tools_dialog.cek_fttt()
+	s << swg_dsn_admin_engine.get_current_job()
+
+	_if s _is _unset
+	_then
+		write("No Design Selected")
+		_leave 
+	_endif
+
+	id << s.id.write_string 
+	nama << s.name.write_string
+	owner << s.owner.write_string
+	pj << s.inf_project.write_string
+	st << s.status.write_string	
+
+	v << gis_program_manager.databases[:gis]
+	a_view << gis_program_manager.ace_view
+	a_ff << float_format.new_with_properties(
+		      :float_format,:fixed,
+		      :float_decimal_places,10)	
+	a_fc << float_format.new_with_properties(
+		      :float_format,:fixed,
+		      :float_decimal_places,1)
+	
+	change_set << mit_scheme_record_change_set.new(s)
+
+	#looping dalam design ambil obyek yang nanti diperlukan untuk
+	# looping selanjutnya
+	#khusus sheath loc jadikan sector dulu agar bisa diambil first/last coordinatnya
+	sheathlocs << rope.new()
+	towers << rope.new()
+	splices << rope.new()
+	sheaths << rope.new()
+	panels << rope.new()
+	obj_tree << rope.new()
+	
+	_for i _over change_set.fast_elements()
+	_loop
+		name << i.current_record.source_collection.name
+			
+		_if name = "sheath_with_loc"
+		_then 
+			sheathlocs.add(i.current_record)
+		_elif name = "mit_tower"
+		_then
+			towers.add(i.current_record)
+		_elif name = "sheath_splice"
+		_then
+			splices.add(i.current_record)
+		_elif name = "sheath"
+		_then
+			sheaths.add(i.current_record)
+		_elif name = "switch_panel"
+		_then
+			panels.add(i.current_record)
+		_endif 
+	_endloop	
+	
+	towers_asc << towers.as_sorted_collection( :sort_by_program )
+	
+	#looping urut tower
+	_for i _over towers_asc.fast_elements()
+	_loop		
+		
+		#scan sheath terdekat	
+		ff << 5000		
+		(s_sheath,obj_sheath) << _self.scan_sheath(i.location,ff)
+		#scan OTB terdekat
+		(s_t_closure,obj_t_closure) << _self.scan_OTB(obj_sheath.route.last_coord,ff)
+			
+		cs1 <<  v.world.coordinate_system 
+		cs2 << a_view.collections[:sw_gis!coordinate_system].at(:world_longlat_wgs84_degree)
+		t << transform.new_converting_cs_to_cs(cs1,cs2)
+		h << obj_t_closure.location.coord		
+		w_conv << t.convert(h)
+		latitud << w_conv.y
+		longitud << w_conv.x
+	
+		koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
+	
+		c_pin<< obj_t_closure.connections_and_pins().an_element()
+		port_jml << (c_pin.pin2.get_splice().switch_panel.an_element().number_of_ports)
+			
+		panel_out << rope.new()
+		panel_in << rope.new()
+		_for j _over obj_t_closure.connections_and_pins().fast_elements()
+		_loop		
+			
+			_if j.pin2.short_connection_description().slice(1,3) = "OUT"
+			_then
+				panel_out.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
+				
+			_else			
+				panel_in.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
+			_endif 			
+	
+		_endloop
+
+		panel_out << simple_vector.new_from(panel_out)
+
+		panel_in << simple_vector.new_from(panel_in)
+
+		#check khusus last OTB, no next sheath_loc_spec
+		_if i.program = towers.size.write_string
+		_then			
+			obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, panel_in, panel_out, _unset, obj_t_closure.te_object_type, 0 })
+			_leave 
+		_endif 
+		
+		#looping cables yang terhubung dengan OTB mencari kabel yang
+		# mana yang last coord = first coord jadi itu kabel lanjutannya
+		current_cable << _unset
+		next_cable << _unset
+		sheath_loc_spec << _unset
+			
+		_for j _over c_pin.pin2.get_splice().connected_cables().fast_elements()
+		_loop
+			
+			current_cable << j
+			sheath_loc_coord << j.route_coordinates().coords		
+			ketemu << 0
+			counter << 0		
+			
+			_for k _over sheathlocs.fast_elements()
+			 _loop				
+				k_route << k.route_coordinates().coords
+				counter +<< 1
+				
+			 	_if sheath_loc_coord.last = k_route.first
+				_then
+					#jika kabel tidak bolak balik (in/out) karena dari OTB ke ODP
+					# itu ada dua kabel, bisa dimungkinkan terdeteksi last coord = first coord
+					# karena penggambarannya satu dari ODP lainnya dari OTB)
+					_if sheath_loc_coord.first <> k_route.last
+					_then																
+						sheath_loc_spec << j.spec_id
+						next_cable << k
+						#hapus dari list sheat loc agar tidak terdeteksi lagi selama
+						# next pencarian
+						sheathlocs.remove_nth(counter)			
+						ketemu << 1					
+						#insert to tree
+						# obj_tree.add({tower.name, OTB Spec, OTB name, OTB coord, OTB
+						# fiber count, OTB fiber in, fiber out, Sheath LOC spec out}		
+						obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)) })
+					_endif
+				
+				_endif 
+			
+				_if ketemu = 1 _then _leave _endif 
+			 _endloop
+			 _if ketemu = 1 _then _leave _endif 
+		_endloop 
+
+		#scan ODP/Closure
+		#reassignment menjadi rope lagi		
+		panel_out << rope.new()
+		panel_in << rope.new()
+		port_jml << 0		
+		obj_name << _unset
+		
+		 _for data _over splices.fast_elements()
+		 _loop					 
+			 _if data.location _isnt _unset 
+			 _then
+				 #deteksi Object ODP/Closure yang nempel di current_table
+				 _if sheath_loc_coord.last = data.location.coord
+				 _then
+					 obj_name << data
+					 
+					 #in adalah current_cable								 
+
+					  _for kabel _over obj_name.signal_cable_pins().fast_elements()
+					 _loop
+						 _if kabel.sheath_with_loc = current_cable
+						 _then							 
+							 _for in _over kabel.all_connections().fast_elements()
+							 _loop
+								 _for fiber_num _over range(in.pin1.act_low.as_number(), in.pin1.act_high.as_number())
+								 _loop									
+									 panel_in.add(fiber_num)
+								_endloop 								 
+							 _endloop				
+						  _endif 
+					 _endloop
+					 
+					 #out adalah next cable nya					 
+				
+					  _for kabel _over obj_name.signal_cable_pins().fast_elements()
+					 _loop
+						 _if kabel.sheath_with_loc = next_cable
+						 _then							 
+							 _for out _over kabel.all_connections().fast_elements()
+							 _loop
+								  _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
+								 _loop	
+									 panel_out.add(fiber_num)
+								_endloop 
+							 _endloop				
+						  _endif 
+					 _endloop
+					 
+					 #Deteksi type dan jml fiber
+					 splice_name << obj_name.spec_id.numbers_and_strings
+					 
+					 _for splice _over splice_name.fast_elements()
+					 _loop
+						 _if splice.class_name _isnt :integer
+						 _then 
+							 _if splice.trim_spaces() ="ODP" _orif splice.trim_spaces()="Join Closure" _orif splice.trim_spaces()="ODC"
+							 _then
+								 _for port _over splice_name.fast_elements()
+								 _loop
+									 _if port.class_name _is :integer _then port_jml << port.as_number() _endif 
+								_endloop 
+							 _endif
+						_endif 
+						
+					_endloop 
+				
+				 _endif				 
+			_endif 
+		 _endloop
+		panel_out << simple_vector.new_from(panel_out)	
+		panel_in << simple_vector.new_from(panel_in)
+
+		#get koordinat objek
+		h << obj_name.location.coord		
+		w_conv << t.convert(h)
+		latitud << w_conv.y
+		longitud << w_conv.x
+	
+		koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
+		sheath_loc_spec << next_cable.spec_id
+		
+		 obj_tree.add({i.program, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(next_cable.calculated_sheath_length.value_in(:m)) })			
+		 
+		 ######################
+		 #next cable detection
+		 ######################
+
+		 pj_cable << 0
+		 
+		 _loop
+			 #scan ODP/Closure
+			 #reassignment menjadi rope lagi		
+			 panel_out << rope.new()
+			 panel_in << rope.new()
+			 port_jml << 0		
+			 obj_name << _unset 
+			 		 
+			 (s_t_closure, obj_t_closure, obj_name, panel_in, panel_out, port_jml, next_cable) << _self.scan_splice(splices, sheathlocs, next_cable, panel_in, panel_out, port_jml)
+			 			 
+			 #next OTB = true then selesai
+			_if s_t_closure
+			_then
+				
+				panel_out << simple_vector.new_from(panel_out)
+				panel_in << simple_vector.new_from(panel_in)			 
+			 			 
+				h << obj_name.location.coord		
+				w_conv << t.convert(h)
+				latitud << w_conv.y
+				longitud << w_conv.x
+			
+				koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
+
+				#update pj_cable pada rope terakhir
+				#ini mengantisipasi kabel yang bersambung sampe dengan ODP/OTB
+				obj_tree[obj_tree.size][10] << a_fc.format(obj_tree[obj_tree.size][10].as_number() + pj_cable)
+					
+			 	pj_cable << next_cable.calculated_sheath_length.value_in(:m)				
+				sheath_loc_spec << next_cable.spec_id 				
+				
+				obj_tree.add({i.program, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable)})
+				
+				pj_cable << 0
+				
+				#jika ketemu closure maka leave
+				write(s_t_closure)
+				write("----")
+				
+				_leave
+			_else
+				#jika obj_name exist(ODP/Closure), masih perlu dicek next
+				# cablenya apakah langsung ketemu object, jika
+				# tidak maka simpan next cable dan jumlahkan lengthnya
+				#jika ya langsung simpan ke obj_tree, lanjut looping 
+				_if obj_name _isnt _unset
+				_then
+				
+					panel_out << simple_vector.new_from(panel_out)
+					panel_in << simple_vector.new_from(panel_in)			 
+			 			 
+					h << obj_name.location.coord		
+					w_conv << t.convert(h)
+					latitud << w_conv.y
+					longitud << w_conv.x
+			
+					koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
+
+					#update pj_cable pada rope terakhir
+					#ini mengantisipasi kabel yang bersambung sampe dengan ODP/OTB
+					obj_tree[obj_tree.size][10] << a_fc.format(obj_tree[obj_tree.size][10].as_number() + pj_cable)
+				
+			 		pj_cable << next_cable.calculated_sheath_length.value_in(:m)									
+					sheath_loc_spec << next_cable.spec_id
+					
+					obj_tree.add({i.program, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable)})
+					
+					pj_cable << 0
+				_endif
+			
+				sheath_loc_coord << next_cable.route_coordinates().coords
+			
+				#Cari next kabelnya dengan syarat tidak ada object ODP/ODC
+				ketemu << 0
+				_for data _over splices.fast_elements()
+				_loop
+				 
+				 _if data.location _isnt _unset				 
+				 _then
+					 _if sheath_loc_coord.last = data.location.coord 
+					 _then
+						 ketemu << 1
+					_endif 
+				 _endif
+				_endloop
+				
+				_if ketemu = 0
+				_then 
+					_for data _over sheathlocs.fast_elements()
+					_loop
+						data_coord << data.route_coordinates().coords
+						_if sheath_loc_coord.last = data_coord.first
+						_then
+						 
+							next_cable << data
+							 pj_cable << data.calculated_sheath_length.value_in(:m) 
+							 write("cable: ", data.name, " ", pj_cable)
+							_leave						 
+						_endif 
+					_endloop
+				_endif 
+			_endif		
+		 _endloop
+		
+	_endloop
+
+	_self.export_to_excel(obj_tree, pj)	
+
+_endmethod
+$
+_method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
+
+	a_filename << "C:\template_boq\default_core_pop.xlsx"
+	
+	Excel_Object << OLE_Client.Create_Object("Excel.Application")	
+
+	a_fc << float_format.new_with_properties(
+		      :float_format,:fixed,
+		      :float_decimal_places,1)
+	
+	Workbooks << Excel_Object.Workbooks ()
+	WorkBook << Workbooks.add(a_filename) 			
+	Sheet << WorkBook.Worksheets ("Man Core fttt")
+		
+	kolom << -1
+	counter << 1
+	Cell_prj << Sheet.Cells(3,2)
+	Cell_prj.value << "Project/Design name: " + pj
+	
+	_for data _over obj_tree.fast_elements()
+	_loop
+		
+		kolom << kolom + 4
+		Cell_name << Sheet.Cells(5,kolom) #B5
+		Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+		Cell_name.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+		Cell_name.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+		Cell_name.Borders(:xlEdgeTop).Weight << :xlThick
+		Cell_name.Borders(:xlEdgeLeft).Weight << :xlThick
+		Cell_name.Borders(:xlEdgeRight).Weight << :xlThick
+			
+		Cell_desc << Sheet.Cells(6,kolom)
+		Cell_desc.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+		Cell_desc.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+		Cell_desc.Borders(:xlEdgeLeft).Weight << :xlThick
+		Cell_desc.Borders(:xlEdgeRight).Weight << :xlThick
+			
+		Cell_coord << Sheet.Cells(7,kolom)
+		Cell_coord.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+		Cell_coord.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+		Cell_coord.Borders(:xlEdgeLeft).Weight << :xlThick
+		Cell_coord.Borders(:xlEdgeRight).Weight << :xlThick
+		Cell_coord.Borders(:xlEdgeBottom).Weight << :xlThick
+			
+		Cell_name.value << data[2].write_string	
+		Cell_desc.value << data[3].write_string
+		Cell_coord.value << data[4].write_string
+
+		_if data[9] = "OTB"
+		_then				
+			Cell_coord.Interior.ColorIndex << 41
+			Cell_desc.Interior.ColorIndex << 41
+			Cell_name.Interior.ColorIndex << 41
+		_elif data[9] = "ODP"
+		_then
+			Cell_coord.Interior.ColorIndex << 36
+			Cell_desc.Interior.ColorIndex << 36
+			Cell_name.Interior.ColorIndex << 36
+		_endif
+			
+		Cell_fiber << Sheet.Cells(8,kolom)
+		Cell_fiber.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+		Cell_fiber.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+		Cell_fiber.Borders(:xlEdgeLeft).Weight << :xlThick
+		Cell_fiber.Borders(:xlEdgeRight).Weight << :xlThick
+		Cell_fiber.Borders(:xlEdgeBottom).Weight << :xlThick
+		Cell_fiber.HorizontalAlignment << :xlCenter
+		Cell_fiber.value << "Fiber Number (" + data[5].write_string + "c )"
+
+		Cell_In << Sheet.Cells(8,kolom - 1)
+		Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+		Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+		Cell_In.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+		Cell_In.Borders(:xlEdgeLeft).Weight << :xlThick
+		Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
+		Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
+		Cell_In.HorizontalAlignment << :xlCenter
+		Cell_In.value << "IN"
+
+		Cell_Out << Sheet.Cells(8,kolom + 1)
+		Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+		Cell_Out.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+		Cell_Out.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+		Cell_Out.Borders(:xlEdgeTop).Weight << :xlThick
+		Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
+		Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
+		Cell_Out.HorizontalAlignment << :xlCenter
+		Cell_Out.value << "OUT"
+
+		Sheet.Cells(1, kolom).EntireColumn.Autofit
+		pnl_in << 0
+		pnl_out << 0	
+
+		### looping sesuai yang connected aja jadi tidak terlalu banyak
+		## looping fiber numbernya
+		_if (data[6].size <> 0)
+		_then
+			pnl_in << data[6].as_sorted_collection()
+			pnl_in << pnl_in[pnl_in.size]
+		_endif
+		_if (data[7].size <> 0)
+		_then
+			pnl_out << data[7].as_sorted_collection()
+			pnl_out << pnl_out[pnl_out.size]
+		_endif
+
+		#tentukan banyaknya line yang dicreate
+		_if counter <> obj_tree.size
+		_then
+			_if (pnl_in > pnl_out)
+			_then
+				ports << pnl_in
+			_else
+				ports << pnl_out
+			_endif
+		
+			counter +<< 1
+		_else
+			pnl_out << obj_tree[obj_tree.size-1][7].as_sorted_collection()
+			pnl_out << pnl_out[pnl_out.size]
+			ports << pnl_out
+		_endif 
+		
+		_for i _over range (1, ports)
+		_loop
+			j << i + 8
+			fiber_num << Sheet.Cells(j, kolom)
+			fiber_num.value << i.write_string
+			fiber_num.HorizontalAlignment << :xlCenter
+			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+			
+			fiber_num << Sheet.Cells(j,kolom-1)
+			fiber_num.HorizontalAlignment << :xlCenter
+			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous			
+			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+
+			fiber_num << Sheet.Cells(j,kolom+1)
+			fiber_num.HorizontalAlignment << :xlCenter
+			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous			
+			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+			_if (i = ports)
+			_then
+				fiber_num << Sheet.Cells(j,kolom-1)			
+				fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+				fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				fiber_num << Sheet.Cells(j, kolom)			
+				fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+				fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				fiber_num << Sheet.Cells(j,kolom+1)			
+				fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+				fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+
+				_if data[9] = "OTB"
+				_then
+					pj_cable << 0
+					#jumlahkan total length tiap tower
+					_for tower _over obj_tree.fast_elements()
+					_loop
+						_if tower[1].as_number() = data[1].as_number()
+						_then
+							pj_cable << pj_cable + tower[10].as_number()
+						_endif					
+					_endloop 
+					Cell_total_pj_cable << Sheet.Cells(j+2,kolom)
+					Cell_total_pj_cable.value << "Total Cable Length: "
+					Cell_total_pj_cable << Sheet.Cells(j+2,kolom+1)
+					Cell_total_pj_cable.value << a_fc.format(pj_cable).write_string + " m"
+				_endif 			
+			_endif 
+		_endloop 
+		
+		_for in _over data[6].fast_elements()
+		_loop
+			# default satu bundle adalah 6 warna
+			j << in.as_number() + 8
+			_if (in.as_number() _mod 6) = 1
+			_then
+				idx << 5 #blue
+			_elif (in.as_number() _mod 6) = 2
+			_then
+				idx << 46 #orange
+			_elif (in.as_number() _mod 6) = 3
+			_then
+				idx << 10 #green
+			_elif (in.as_number() _mod 6) = 4
+			_then
+				idx << 9 #brown
+			_elif (in.as_number() _mod 6) = 5
+			_then
+				idx << 15 #abu-abu
+			_elif (in.as_number() _mod 6) = 0
+			_then
+				idx << 20 #white
+			_endif 
+				
+			fiber_num << Sheet.Cells(j, kolom-1)			
+			fiber_num.Interior.ColorIndex << idx
+			
+			
+		_endloop
+		_for out _over data[7].fast_elements()
+		_loop
+			# default satu bundle adalah 6 warna
+			j << out.as_number() + 8
+			_if (out.as_number() _mod 6) = 1
+			_then
+				idx << 5 #blue
+			_elif (out.as_number() _mod 6) = 2
+			_then
+				idx << 46 #orange
+			_elif (out.as_number() _mod 6) = 3
+			_then
+				idx << 10 #green
+			_elif (out.as_number() _mod 6) = 4
+			_then
+				idx << 9 #brown
+			_elif (out.as_number() _mod 6) = 5
+			_then
+				idx << 15 #abu-abu
+			_elif (out.as_number() _mod 6) = 0
+			_then
+				idx << 20 #white
+			_endif 
+				
+			fiber_num << Sheet.Cells(j, kolom+1)			
+			fiber_num.Interior.ColorIndex << idx
+		_endloop
+
+		_if data[8] _isnt _unset 
+		_then
+			fiber_cable_line << data[7].as_sorted_collection() 
+			fiber_cable_line << (fiber_cable_line[fiber_cable_line.size] _div 2) + 8 # agar selalu tergambar di tengah
+			fiber_cable << Sheet.Cells(fiber_cable_line, kolom+2)
+			fiber_cable.Interior.Pattern << :xlSolid
+			fiber_cable.Borders(:xlEdgeBottom).LineStyle << :xlDouble
+			fiber_cable.Borders(:xlEdgeBottom).Weight << :xlThick
+			fiber_cable.value << data[8].write_string
+			fiber_cable << Sheet.Cells(fiber_cable_line+1, kolom+2)
+			fiber_cable.value << "Length: " + data[10].default(0).write_string + " m"
+			
+			Sheet.Columns(kolom+2).EntireColumn.Autofit #Column E
+		_endif	
+			
+	_endloop
+
+	Excel_Object.Visible << _True
+	
+_endmethod
+					    
+_method rwwi_apd_tools_dialog.scan_sheath( c , buf_ti )
+	## 
+	##
+	v_gis << gis_program_manager.databases[:gis]
+	sheath_col << v_gis.collections[:sheath]
+
+	t0 << system.time_now()
+	count << 0
+	_dynamic !current_world! << v_gis.collections[:sw_gis!world].at(0,0)
+	_dynamic !current_coordinate_system! << v_gis.collections[:sw_gis!world].at(0,0).coordinate_system
+
+	pa << pseudo_point.new(c)
+	pa.world << v_gis.world
+
+	a_buffe << pa.buffer(buf_ti)
+	a_buffe.world << !current_world!
+	
+	pred << predicate.interacts(:route , {a_buffe})
+
+	g << sheath_col.select(pred)
+
+	_if g.size > 0 _then
+		h << _true
+		gg << g.an_element()
+	_else
+		h << _false
+		gg << _unset 
+	_endif
+
+	>> h,gg
+
+_endmethod
+$
+_method rwwi_apd_tools_dialog.scan_OTB( c , buf_ti )
+	## 
+	##	
+	v_gis << gis_program_manager.databases[:gis]
+	closures_col << v_gis.collections[:mit_terminal_enclosure]
+
+	t0 << system.time_now()
+	count << 0
+	_dynamic !current_world! << v_gis.collections[:sw_gis!world].at(0,0)
+	_dynamic !current_coordinate_system! << v_gis.collections[:sw_gis!world].at(0,0).coordinate_system
+
+	pa << pseudo_point.new(c)
+	pa.world << v_gis.world
+
+	a_buffe << pa.buffer(buf_ti)
+	a_buffe.world << !current_world!
+	
+	pred << predicate.interacts(:location , {a_buffe})
+
+	g << closures_col.select(pred)
+
+	_if g.size > 0 _then
+		h << _true
+		gg << g.an_element()
+	_else
+		h << _false
+		gg << _unset 
+	_endif
+
+	>> h,gg
+
+_endmethod
+$
+_method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel_in, panel_out, port_jml )
+	
+	sheath_loc_coord << next_cable.route_coordinates().coords
+	current_cable << next_cable
+	
+	_for data _over splices.fast_elements()
+	_loop
+				 
+		 _if data.location _isnt _unset 
+		 _then			 
+					
+			 _if sheath_loc_coord.last = data.location.coord 
+			 _then					
+				 obj_name << data
+									 
+				 #looping cable2 yang nempel di object
+				 _for loc _over obj_name.mit_sheath_with_loc_pins.fast_elements()
+				 _loop
+					 next_cable_coord << loc.sheath_with_loc.route_coordinates().coords
+					 _if next_cable_coord.first = data.location.coord
+					 _then															
+						 #scan OTB terdekat, if yes then exit
+						 ff << 500
+						 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)
+						
+						 next_cable << loc.sheath_with_loc						
+						 _leave							
+					 _endif
+				 _endloop
+						
+				#in	 					 
+				 _for kabel _over obj_name.signal_cable_pins().fast_elements()
+				 _loop
+					 _if kabel.sheath_with_loc = current_cable
+					 _then							 
+						 _for in _over kabel.all_connections().fast_elements()
+						 _loop
+							 _for fiber_num _over range(in.pin2.act_low.as_number(), in.pin2.act_high.as_number())
+							 _loop									
+								 panel_in.add(fiber_num)
+							_endloop 								 
+						 _endloop				
+					 _endif 
+				 _endloop
+
+				 #out				
+				 _for kabel _over obj_name.signal_cable_pins().fast_elements()
+				 _loop
+					 _if kabel.sheath_with_loc = next_cable
+					 _then							 
+						 _for out _over kabel.all_connections().fast_elements()
+						 _loop
+							  _for fiber_num _over range(out.pin1.act_low.as_number(), out.pin1.act_high.as_number())
+							 _loop	
+								 panel_out.add(fiber_num)
+							_endloop 
+						 _endloop				
+					  _endif 
+				_endloop
+					 
+				 #Deteksi type dan jml fiber
+				 splice_name << obj_name.spec_id.numbers_and_strings
+						
+				 _for splice _over splice_name.fast_elements()
+				 _loop
+					 _if splice.class_name _isnt :integer
+					 _then 
+						 _if splice.trim_spaces() ="ODP" _orif splice.trim_spaces()="Join Closure" _orif splice.trim_spaces()="ODC"
+						 _then
+							 _for port _over splice_name.fast_elements()
+							 _loop
+								 _if port.class_name _is :integer _then port_jml << port.as_number() _endif 
+							 _endloop 
+						 _endif
+					 _endif 
+						
+				 _endloop 
+					 
+			_endif
+					
+		_endif 
+	_endloop
+	>> s_t_closure, obj_t_closure, obj_name, panel_in, panel_out, port_jml, next_cable
+_endmethod
+$
+sorted_collection.define_order_proc(:sort_by_program,
+   _proc(person1,person2)
+      _return person1.program _cf person2.program
+   _endproc )
+
+$
