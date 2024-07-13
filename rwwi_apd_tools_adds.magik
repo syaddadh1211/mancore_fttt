@@ -1004,7 +1004,6 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 #			 _if ketemu = 1 _then _leave _endif 
 		_endloop 
 
-		print(obj_tree[1])
 		_leave
 		
 		#scan ODP/Closure
@@ -1203,7 +1202,6 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		 _leave 
 	_endloop
 
-	_leave 
 	_self.export_to_excel(obj_tree, pj)	
 
 _endmethod
@@ -1226,10 +1224,10 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	counter << 1
 	Cell_prj << Sheet.Cells(3,2)
 	Cell_prj.value << "Project/Design name: " + pj
-	
+		
 	_for data _over obj_tree.fast_elements()
 	_loop
-		
+	
 		kolom << kolom + 4
 		Cell_name << Sheet.Cells(5,kolom) #B5
 		Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
@@ -1303,6 +1301,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 
 		### looping sesuai yang connected aja jadi tidak terlalu banyak
 		## looping fiber numbernya
+	
 		_if (data[6].size <> 0)
 		_then
 			pnl_in << data[6].as_sorted_collection()
@@ -1315,6 +1314,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		_endif
 
 		#tentukan banyaknya line yang dicreate
+	
 		_if counter <> obj_tree.size
 		_then
 			_if (pnl_in > pnl_out)
@@ -1330,7 +1330,8 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			pnl_out << pnl_out[pnl_out.size]
 			ports << pnl_out
 		_endif 
-		
+			write("ports: ", ports)
+			
 		_for i _over range (1, ports)
 		_loop
 			j << i + 8
