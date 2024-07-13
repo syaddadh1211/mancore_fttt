@@ -1,4 +1,3 @@
-#Testing
 custom_textbox_layout_element.add_category_type_configuration ( 
                 :span_att, :span_name, :span_name|()| )
 $				
@@ -888,13 +887,15 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	#looping urut tower
 	_for i _over towers_asc.fast_elements()
 	_loop		
+
+		#_if i.program.as_number() = 1 _then _continue _endif
 		
 		#scan sheath terdekat	
 		ff << 5000		
 		(s_sheath,obj_sheath) << _self.scan_sheath(i.location,ff)
-		#scan OTB terdekat
+		#scan OTB terdekat	
 		(s_t_closure,obj_t_closure) << _self.scan_OTB(obj_sheath.route.last_coord,ff)
-		write(s_t_closure," ",obj_t_closure.name)
+		write("status: ", s_t_closure," nama: ",obj_t_closure.name)
 		
 		cs1 <<  v.world.coordinate_system 
 		cs2 << a_view.collections[:sw_gis!coordinate_system].at(:world_longlat_wgs84_degree)
@@ -906,80 +907,106 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	
 		koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
 	
-		c_pin<< obj_t_closure.connections_and_pins().an_element()
-		port_jml << (c_pin.pin2.get_splice().switch_panel.an_element().number_of_ports)
-			
-		panel_out << rope.new()
-		panel_in << rope.new()
-		_for j _over obj_t_closure.connections_and_pins().fast_elements()
-		_loop		
-			
-			_if j.pin2.short_connection_description().slice(1,3) = "OUT"
-			_then
-				panel_out.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
+		a_bay << obj_t_closure.mit_bays.an_element()
+		port_jml << a_bay.all_rme_port_components().size
+		
+		port_out << rope.new()
+		port_in << rope.new()
+		connected_cables << equality_set.new()
+		      
+		_for a_port _over a_bay.all_rme_port_components().fast_elements()
+		_loop
+			_if a_port.connected?
+			_then				
+				port? << _true 
+				_for inout _over a_port.all_connections().fast_elements()
+				_loop
+					_try				
+						a << inout.destination_pin.description					
+					_when does_not_understand
+						connected_cables.add(inout.destination_pin.owner)
+						port_out.add(a_port.description)
+						port? << _false 
+					_endtry 				
+				_endloop
+				_if port? _then port_in.add(a_port.description) _endif 
 				
-			_else			
-				panel_in.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
-			_endif 			
-	
-		_endloop
+			_endif 
+			
+		_endloop										
 
-		panel_out << simple_vector.new_from(panel_out)
+#		_for j _over obj_t_closure.connections_and_pins().fast_elements()
+#		_loop		
+#			
+#			_if j.pin2.short_connection_description().slice(1,3) = "OUT"
+#			_then
+#				panel_out.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
+#				
+#			_else			
+#				panel_in.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
+#			_endif 			
+#	
+#		_endloop
 
-		panel_in << simple_vector.new_from(panel_in)
+		port_out << simple_vector.new_from(port_out)
+
+		port_in << simple_vector.new_from(port_in)
 
 		#check khusus last OTB, no next sheath_loc_spec
-		_if i.program = towers.size.write_string
-		_then			
-			obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, panel_in, panel_out, _unset, obj_t_closure.te_object_type, 0 })
-			_leave 
-		_endif 
+#		_if i.program = towers.size.write_string
+#		_then			
+#			obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, panel_in, panel_out, _unset, obj_t_closure.te_object_type, 0 })
+#			_leave 
+#		_endif 
 		
 		#looping cables yang terhubung dengan OTB mencari kabel yang
 		# mana yang last coord = first coord jadi itu kabel lanjutannya
-		current_cable << _unset
+		current_cable << _unset 
 		next_cable << _unset
 		sheath_loc_spec << _unset
 			
-		_for j _over c_pin.pin2.get_splice().connected_cables().fast_elements()
-		_loop
-			
+		_for j _over connected_cables.fast_elements()
+		_loop			
 			current_cable << j
-			sheath_loc_coord << j.route_coordinates().coords		
+			sheath_loc_coord << j.route_coordinates().coords
+		
 			ketemu << 0
 			counter << 0		
-			
 			_for k _over sheathlocs.fast_elements()
-			 _loop				
-				k_route << k.route_coordinates().coords
-				counter +<< 1
+			 _loop
+				_if k _isnt _unset
+				_then 
+					k_route << k.route_coordinates().coords
+					counter +<< 1
 				
-			 	_if sheath_loc_coord.last = k_route.first
-				_then
-					#jika kabel tidak bolak balik (in/out) karena dari OTB ke ODP
-					# itu ada dua kabel, bisa dimungkinkan terdeteksi last coord = first coord
-					# karena penggambarannya satu dari ODP lainnya dari OTB)
-					_if sheath_loc_coord.first <> k_route.last
-					_then																
-						sheath_loc_spec << j.spec_id
-						next_cable << k
+					_if sheath_loc_coord.last = k_route.first
+					_then
+						#jika kabel tidak bolak balik (in/out) karena dari OTB ke ODP
+						# itu ada dua kabel, bisa dimungkinkan terdeteksi last coord = first coord
+						# karena penggambarannya satu dari ODP lainnya dari OTB)
+						_if sheath_loc_coord.first <> k_route.last
+						_then																
+							sheath_loc_spec << j.spec_id
+							next_cable << k
 						#hapus dari list sheat loc agar tidak terdeteksi lagi selama
 						# next pencarian
-						sheathlocs.remove_nth(counter)			
-						ketemu << 1					
+							sheathlocs.remove_nth(counter)			
+							ketemu << 1					
 						#insert to tree
 						# obj_tree.add({tower.name, OTB Spec, OTB name, OTB coord, OTB
 						# fiber count, OTB fiber in, fiber out, Sheath LOC spec out}		
-						obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)) })
-					_endif
-				
+							obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)) })
+						_endif				
+					_endif 
 				_endif 
-			
-				_if ketemu = 1 _then _leave _endif 
-			 _endloop
-			 _if ketemu = 1 _then _leave _endif 
+#				_if ketemu = 1 _then _leave _endif 
+			_endloop
+#			 _if ketemu = 1 _then _leave _endif 
 		_endloop 
 
+		print(obj_tree[1])
+		_leave
+		
 		#scan ODP/Closure
 		#reassignment menjadi rope lagi		
 		panel_out << rope.new()
@@ -1172,9 +1199,11 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				_endif 
 			_endif		
 		 _endloop
-		
+
+		 _leave 
 	_endloop
 
+	_leave 
 	_self.export_to_excel(obj_tree, pj)	
 
 _endmethod
