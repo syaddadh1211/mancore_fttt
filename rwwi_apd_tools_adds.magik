@@ -886,9 +886,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	
 	#looping urut tower
 	_for i _over towers_asc.fast_elements()
-	_loop		
-
-		#_if i.program.as_number() = 1 _then _continue _endif
+	_loop	
 		
 		#scan sheath terdekat	
 		ff << 5000		
@@ -933,31 +931,18 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				
 			_endif 
 			
-		_endloop										
-
-#		_for j _over obj_t_closure.connections_and_pins().fast_elements()
-#		_loop		
-#			
-#			_if j.pin2.short_connection_description().slice(1,3) = "OUT"
-#			_then
-#				panel_out.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
-#				
-#			_else			
-#				panel_in.add(j.pin2.short_connection_description().slice(6, j.pin2.short_connection_description().size ).trim_left_spaces().as_number())
-#			_endif 			
-#	
-#		_endloop
-
+		_endloop
+		
 		port_out << simple_vector.new_from(port_out)
 
 		port_in << simple_vector.new_from(port_in)
 
 		#check khusus last OTB, no next sheath_loc_spec
-#		_if i.program = towers.size.write_string
-#		_then			
-#			obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, panel_in, panel_out, _unset, obj_t_closure.te_object_type, 0 })
-#			_leave 
-#		_endif 
+		_if i.program = towers.size.write_string
+		_then			
+			obj_tree.add({i.program, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out , _unset, obj_t_closure.te_object_type, 0 })
+			_leave 
+		_endif 
 		
 		#looping cables yang terhubung dengan OTB mencari kabel yang
 		# mana yang last coord = first coord jadi itu kabel lanjutannya
@@ -999,12 +984,10 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 						_endif				
 					_endif 
 				_endif 
-#				_if ketemu = 1 _then _leave _endif 
-			_endloop
-#			 _if ketemu = 1 _then _leave _endif 
-		_endloop 
 
-		_leave
+			_endloop
+
+		_endloop 
 		
 		#scan ODP/Closure
 		#reassignment menjadi rope lagi		
@@ -1088,7 +1071,8 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		sheath_loc_spec << next_cable.spec_id
 		
 		 obj_tree.add({i.program, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(next_cable.calculated_sheath_length.value_in(:m)) })			
-		 
+	
+			 
 		 ######################
 		 #next cable detection
 		 ######################
@@ -1198,8 +1182,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				_endif 
 			_endif		
 		 _endloop
-
-		 _leave 
+		 
 	_endloop
 	
 	_self.export_to_excel(obj_tree, pj)	
@@ -1273,7 +1256,12 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		Cell_fiber.Borders(:xlEdgeRight).Weight << :xlThick
 		Cell_fiber.Borders(:xlEdgeBottom).Weight << :xlThick
 		Cell_fiber.HorizontalAlignment << :xlCenter
-		Cell_fiber.value << "Fiber Number (" + data[5].write_string + "c )"
+		_if data[9] = "OTB"		
+		_then
+			Cell_fiber.value << "Port Number (" + data[5].write_string + " port)"
+		_else 
+			Cell_fiber.value << "Fiber Number (" + data[5].write_string + "c)"
+		_endif 
 
 		Cell_In << Sheet.Cells(8,kolom - 1)
 		Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
@@ -1298,10 +1286,10 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		Sheet.Cells(1, kolom).EntireColumn.Autofit
 		pnl_in << 0
 		pnl_out << 0	
-
+		ports << 0
 		### looping sesuai yang connected aja jadi tidak terlalu banyak
 		## looping fiber numbernya
-			
+		
 		_if (data[6].size <> 0)
 		_then			
 			pnl_in << data[6].as_sorted_collection()			
@@ -1316,23 +1304,24 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		#tentukan banyaknya line yang dicreate
 	
 		_if counter <> obj_tree.size
-		_then
-		
-			_if (pnl_in > pnl_out)
-			_then
-				ports << pnl_in
+		_then		
+			
+			_if (pnl_in.as_number() > pnl_out.as_number())
+			_then							
+				ports << pnl_in.as_number()
 			_else
-				ports << pnl_out
+				ports << pnl_out.as_number()
+
 			_endif
-		
-			counter +<< 1
-		_else				
+			counter +<< 1			
+		_else
+			
 			pnl_out << obj_tree[obj_tree.size-1][7].as_sorted_collection()
 			pnl_out << pnl_out[pnl_out.size]
-			ports << pnl_out
+			ports << pnl_out.as_number()
 		
 		_endif 
-			
+		
 		_for i _over range (1, ports)
 		_loop
 			j << i + 8
@@ -1444,7 +1433,8 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		_if data[8] _isnt _unset 
 		_then
 			fiber_cable_line << data[7].as_sorted_collection() 
-			fiber_cable_line << (fiber_cable_line[fiber_cable_line.size] _div 2) + 8 # agar selalu tergambar di tengah
+			#fiber_cable_line << (fiber_cable_line[fiber_cable_line.size] _div 2) + 8 # agar selalu tergambar di tengah
+			fiber_cable_line << 9
 			fiber_cable << Sheet.Cells(fiber_cable_line, kolom+2)
 			fiber_cable.Interior.Pattern << :xlSolid
 			fiber_cable.Borders(:xlEdgeBottom).LineStyle << :xlDouble
