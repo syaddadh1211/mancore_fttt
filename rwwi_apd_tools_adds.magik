@@ -1201,7 +1201,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 
 		 _leave 
 	_endloop
-
+	
 	_self.export_to_excel(obj_tree, pj)	
 
 _endmethod
@@ -1301,10 +1301,10 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 
 		### looping sesuai yang connected aja jadi tidak terlalu banyak
 		## looping fiber numbernya
-	
+			
 		_if (data[6].size <> 0)
-		_then
-			pnl_in << data[6].as_sorted_collection()
+		_then			
+			pnl_in << data[6].as_sorted_collection()			
 			pnl_in << pnl_in[pnl_in.size]
 		_endif
 		_if (data[7].size <> 0)
@@ -1317,6 +1317,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	
 		_if counter <> obj_tree.size
 		_then
+		
 			_if (pnl_in > pnl_out)
 			_then
 				ports << pnl_in
@@ -1325,12 +1326,12 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			_endif
 		
 			counter +<< 1
-		_else
+		_else				
 			pnl_out << obj_tree[obj_tree.size-1][7].as_sorted_collection()
 			pnl_out << pnl_out[pnl_out.size]
 			ports << pnl_out
+		
 		_endif 
-			write("ports: ", ports)
 			
 		_for i _over range (1, ports)
 		_loop
