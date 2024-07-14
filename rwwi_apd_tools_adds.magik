@@ -889,9 +889,10 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_loop	
 		
 		#scan sheath terdekat	
-		ff << 5000		
+		ff << 500		
 		(s_sheath,obj_sheath) << _self.scan_sheath(i.location,ff)
-		#scan OTB terdekat	
+		#scan OTB terdekat
+		        ff << 100
 		(s_t_closure,obj_t_closure) << _self.scan_OTB(obj_sheath.route.last_coord,ff)
 		write("status: ", s_t_closure," nama: ",obj_t_closure.name)
 		
@@ -1186,7 +1187,8 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_endloop
 	
 	_self.export_to_excel(obj_tree, pj)	
-
+	.owner.show_alert("Done!")
+	
 _endmethod
 $
 _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
@@ -1540,7 +1542,7 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 					 _if next_cable_coord.first = data.location.coord
 					 _then															
 						 #scan OTB terdekat, if yes then exit
-						 ff << 500
+						 ff << 100
 						 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)
 						
 						 next_cable << loc.sheath_with_loc						
