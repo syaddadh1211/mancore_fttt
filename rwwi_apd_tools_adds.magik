@@ -1093,7 +1093,12 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			 obj_name << _unset 
 			 
 			 (s_t_closure, obj_t_closure, obj_name, panel_in, panel_out, port_jml, next_cable) << _self.scan_splice(splices, sheathlocs, next_cable, panel_in, panel_out, port_jml)
-		 
+
+			 _if s_t_closure _is _unset
+			 _then
+				 .owner.show_alert("Terdeteksi ada kabel yang belum tergambar di penghujung kabel " +  next_cable.name)
+				 _leave
+			_endif 
 			 #next OTB = true then selesai
 			_if s_t_closure
 			_then
