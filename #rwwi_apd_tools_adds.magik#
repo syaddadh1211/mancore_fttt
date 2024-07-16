@@ -1093,7 +1093,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			 obj_name << _unset 
 			 
 			 (s_t_closure, obj_t_closure, obj_name, panel_in, panel_out, port_jml, next_cable) << _self.scan_splice(splices, sheathlocs, next_cable, panel_in, panel_out, port_jml)
-		 
+			write(s_t_closure, " ", obj_t_closure)		 
 			 #next OTB = true then selesai
 			_if s_t_closure
 			_then
