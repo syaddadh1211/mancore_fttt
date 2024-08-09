@@ -1271,17 +1271,17 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 
 	titik_awal << Sheet.Cells(15,10)
 	titik_akhir << Sheet.Cells(9,12)
-	garis << Sheet.Shapes.AddConnector(3, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+	garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
 	garis.line.ForeColor.SchemeColor << 0  #0= hitam, biru
-	garis.line.weight << 2
+	garis.line.weight << 1
 	garis.line.BeginArrowheadStyle << 6
 	garis.line.EndArrowheadStyle << 6
 
 	titik_awal << Sheet.Cells(16,10)
 	titik_akhir << Sheet.Cells(10,12)
-	garis << Sheet.Shapes.AddConnector(3, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+	garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
 	garis.line.ForeColor.SchemeColor << 0  #0= hitam, biru
-	garis.line.weight << 2
+	garis.line.weight << 1
 	garis.line.BeginArrowheadStyle << 6
 	garis.line.EndArrowheadStyle << 6
 	
