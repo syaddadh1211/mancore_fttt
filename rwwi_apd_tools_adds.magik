@@ -1271,17 +1271,17 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 
 	titik_awal << Sheet.Cells(15,10)
 	titik_akhir << Sheet.Cells(9,12)
-	garis << Sheet.Shapes.AddConnector(3, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+	garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
 	garis.line.ForeColor.SchemeColor << 0  #0= hitam, biru
-	garis.line.weight << 2
+	garis.line.weight << 1
 	garis.line.BeginArrowheadStyle << 6
 	garis.line.EndArrowheadStyle << 6
 
 	titik_awal << Sheet.Cells(16,10)
 	titik_akhir << Sheet.Cells(10,12)
-	garis << Sheet.Shapes.AddConnector(3, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+	garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
 	garis.line.ForeColor.SchemeColor << 0  #0= hitam, biru
-	garis.line.weight << 2
+	garis.line.weight << 1
 	garis.line.BeginArrowheadStyle << 6
 	garis.line.EndArrowheadStyle << 6
 	
@@ -1402,29 +1402,108 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	#		ports << pnl_out.as_number()		
 		
 	#	_endif 
-		
+		maks << 36
+		counter << 1
 		_for i _over range (1, ports)
 		_loop
 			j << i + 8
 			fiber_num << Sheet.Cells(j, kolom)
 			#fiber_num.value << i.write_string
+#			fiber_num.HorizontalAlignment << :xlCenter
+#			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+#			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+#			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+#			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+
+			#memberi warna garis kiri dan kanan fiber number ikut bundle 1
+			# s/d 6 core (ada 6 bundle)
+			_if (counter <> maks)
+			_then 
+				_if (counter < 7) #Bundle 1 - blue			
+				_then
+					idx << 5 #Blue
+				_elif counter > 6 _and counter < 12
+				_then 
+					idx << 46 #orange
+				_elif counter > 12 _and counter < 19
+				_then 
+					idx << 10 #green
+				_elif counter > 18 _and counter < 25
+				_then 
+					idx << 9 #brown
+				_elif counter > 24 _and counter < 31
+				_then 
+					idx << 15 #Abu-abu
+				_elif counter > 30 _and counter < 37
+				_then 
+					idx << 2 #white
+				_endif
+				counter +<< 1
+			_else
+				counter << 1
+			_endif 
+
+			fiber_num << Sheet.Cells(j,kolom-1)
 			fiber_num.HorizontalAlignment << :xlCenter
 			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
 			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
 			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
-			
-			fiber_num << Sheet.Cells(j,kolom-1)
-			fiber_num.HorizontalAlignment << :xlCenter
-			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous			
-			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+			fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+			fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
 			fiber_num.value << i.write_string
 
+			_if (i.as_number() _mod 6) = 1
+			_then
+				idx_back << 5 #blue
+			_elif (i.as_number() _mod 6) = 2
+			_then
+				idx_back << 46 #orange
+			_elif (i.as_number() _mod 6) = 3
+			_then
+				idx_back << 10 #green
+			_elif (i.as_number() _mod 6) = 4
+			_then
+				idx_back << 9 #brown
+			_elif (i.as_number() _mod 6) = 5
+			_then
+				idx_back << 15 #abu-abu
+			_elif (i.as_number() _mod 6) = 0
+			_then
+				idx_back << 2 #white
+			_endif 				
+			fiber_num.Interior.ColorIndex << idx_back
+					
 			fiber_num << Sheet.Cells(j,kolom+1)
 			fiber_num.HorizontalAlignment << :xlCenter
-			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous			
-			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
+			fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+			fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
 			fiber_num.value << i.write_string
+			
+			_if (i.as_number() _mod 6) = 1
+			_then
+				idx << 5 #blue
+			_elif (i.as_number() _mod 6) = 2
+			_then
+				idx << 46 #orange
+			_elif (i.as_number() _mod 6) = 3
+			_then
+				idx << 10 #green
+			_elif (i.as_number() _mod 6) = 4
+			_then
+				idx << 9 #brown
+			_elif (i.as_number() _mod 6) = 5
+			_then
+				idx << 15 #abu-abu
+			_elif (i.as_number() _mod 6) = 0
+			_then
+				idx << 2 #white
+			_endif 				
+			fiber_num.Interior.ColorIndex << idx
 			
 			_if (i = ports)
 			_then
@@ -1457,62 +1536,62 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			_endif 
 		_endloop 
 		
-		_for in _over data[6].fast_elements()
-		_loop
-			# default satu bundle adalah 6 warna
-			j << in.as_number() + 8
-			_if (in.as_number() _mod 6) = 1
-			_then
-				idx << 5 #blue
-			_elif (in.as_number() _mod 6) = 2
-			_then
-				idx << 46 #orange
-			_elif (in.as_number() _mod 6) = 3
-			_then
-				idx << 10 #green
-			_elif (in.as_number() _mod 6) = 4
-			_then
-				idx << 9 #brown
-			_elif (in.as_number() _mod 6) = 5
-			_then
-				idx << 15 #abu-abu
-			_elif (in.as_number() _mod 6) = 0
-			_then
-				idx << 20 #white
-			_endif 
-				
-			fiber_num << Sheet.Cells(j, kolom-1)			
-			fiber_num.Interior.ColorIndex << idx
-			
-			
-		_endloop
-		_for out _over data[7].fast_elements()
-		_loop
-			# default satu bundle adalah 6 warna
-			j << out.as_number() + 8
-			_if (out.as_number() _mod 6) = 1
-			_then
-				idx << 5 #blue
-			_elif (out.as_number() _mod 6) = 2
-			_then
-				idx << 46 #orange
-			_elif (out.as_number() _mod 6) = 3
-			_then
-				idx << 10 #green
-			_elif (out.as_number() _mod 6) = 4
-			_then
-				idx << 9 #brown
-			_elif (out.as_number() _mod 6) = 5
-			_then
-				idx << 15 #abu-abu
-			_elif (out.as_number() _mod 6) = 0
-			_then
-				idx << 20 #white
-			_endif 
-				
-			fiber_num << Sheet.Cells(j, kolom+1)			
-			fiber_num.Interior.ColorIndex << idx
-		_endloop
+#		_for in _over data[6].fast_elements()
+#		_loop
+#			# default satu bundle adalah 6 warna
+#			j << in.as_number() + 8
+#			_if (in.as_number() _mod 6) = 1
+#			_then
+#				idx << 5 #blue
+#			_elif (in.as_number() _mod 6) = 2
+#			_then
+#				idx << 46 #orange
+#			_elif (in.as_number() _mod 6) = 3
+#			_then
+#				idx << 10 #green
+#			_elif (in.as_number() _mod 6) = 4
+#			_then
+#				idx << 9 #brown
+#			_elif (in.as_number() _mod 6) = 5
+#			_then
+#				idx << 15 #abu-abu
+#			_elif (in.as_number() _mod 6) = 0
+#			_then
+#				idx << 20 #white
+#			_endif 
+#				
+#			fiber_num << Sheet.Cells(j, kolom-1)			
+#			fiber_num.Interior.ColorIndex << idx
+#			
+#			
+#		_endloop
+#		_for out _over data[7].fast_elements()
+#		_loop
+#			# default satu bundle adalah 6 warna
+#			j << out.as_number() + 8
+#			_if (out.as_number() _mod 6) = 1
+#			_then
+#				idx << 5 #blue
+#			_elif (out.as_number() _mod 6) = 2
+#			_then
+#				idx << 46 #orange
+#			_elif (out.as_number() _mod 6) = 3
+#			_then
+#				idx << 10 #green
+#			_elif (out.as_number() _mod 6) = 4
+#			_then
+#				idx << 9 #brown
+#			_elif (out.as_number() _mod 6) = 5
+#			_then
+#				idx << 15 #abu-abu
+#			_elif (out.as_number() _mod 6) = 0
+#			_then
+#				idx << 20 #white
+#			_endif 
+#				
+#			fiber_num << Sheet.Cells(j, kolom+1)			
+#			fiber_num.Interior.ColorIndex << idx
+#		_endloop
 
 		_if data[8] _isnt _unset 
 		_then
