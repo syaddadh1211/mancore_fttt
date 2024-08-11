@@ -922,7 +922,8 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_loop	
 
 	#	_if i.folders.as_number() = 2 _then _leave _endif
-		
+		write(i.site_id)
+		write(i.name)
 		#scan sheath terdekat	
 		ff << 500		
 		(s_sheath,obj_sheath) << _self.scan_sheath(i.location,ff)
@@ -991,7 +992,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		#check khusus last OTB, no next sheath_loc_spec
 		_if i.folders = towers.size.write_string
 		_then
-			obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out , _unset, obj_t_closure.te_object_type, 0 })
+			obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out , _unset, obj_t_closure.te_object_type, 0, i.site_id, i.name })
 			_leave 
 		_endif 
 
@@ -1037,7 +1038,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 						#insert to tree
 						# obj_tree.add({tower.name, OTB Spec, OTB name, OTB coord, OTB
 						# fiber count, OTB fiber in, fiber out, Sheath LOC spec out}		
-							obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)) })
+							obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)),i.site_id, i.name })
 						_endif				
 					_endif 
 				_endif 
@@ -1127,7 +1128,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
 		sheath_loc_spec << next_cable.spec_id
 		
-		 obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(next_cable.calculated_sheath_length.value_in(:m)) })			
+		 obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(next_cable.calculated_sheath_length.value_in(:m)), _unset, _unset  })			
 	
 			 
 		 ######################
@@ -1172,7 +1173,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			 	pj_cable << next_cable.calculated_sheath_length.value_in(:m)				
 				sheath_loc_spec << next_cable.spec_id 				
 				
-				obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable)})
+				obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable), _unset, _unset})
 				
 				pj_cable << 0
 				
@@ -1207,7 +1208,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			 		pj_cable << next_cable.calculated_sheath_length.value_in(:m)									
 					sheath_loc_spec << next_cable.spec_id
 					
-					obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable)})
+					obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable), _unset, _unset})
 					
 					pj_cable << 0
 				_endif
@@ -1294,14 +1295,34 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	_loop
 	
 		kolom << kolom + 4
-		Cell_name << Sheet.Cells(5,kolom) #B5
-		Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
-		Cell_name.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
-		Cell_name.Borders(:xlEdgeRight).LineStyle << :xlContinuous
-		Cell_name.Borders(:xlEdgeTop).Weight << :xlThick
-		Cell_name.Borders(:xlEdgeLeft).Weight << :xlThick
-		Cell_name.Borders(:xlEdgeRight).Weight << :xlThick
-			
+
+		_if data[9] = "OTB"
+		_then
+			Cell_tower << Sheet.Cells(4,kolom) #B4
+			Cell_tower.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_tower.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			Cell_tower.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			Cell_tower.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_tower.Borders(:xlEdgeLeft).Weight << :xlThick
+			Cell_tower.Borders(:xlEdgeRight).Weight << :xlThick
+		
+			Cell_name << Sheet.Cells(5,kolom) #B5
+			#Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_name.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			Cell_name.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			#Cell_name.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_name.Borders(:xlEdgeLeft).Weight << :xlThick
+			Cell_name.Borders(:xlEdgeRight).Weight << :xlThick
+		_else
+			Cell_name << Sheet.Cells(5,kolom) #B5
+			Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_name.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			Cell_name.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			Cell_name.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_name.Borders(:xlEdgeLeft).Weight << :xlThick
+			Cell_name.Borders(:xlEdgeRight).Weight << :xlThick
+		_endif
+		
 		Cell_desc << Sheet.Cells(6,kolom)
 		Cell_desc.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 		Cell_desc.Borders(:xlEdgeRight).LineStyle << :xlContinuous
@@ -1314,21 +1335,23 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		Cell_coord.Borders(:xlEdgeLeft).Weight << :xlThick
 		Cell_coord.Borders(:xlEdgeRight).Weight << :xlThick
 		Cell_coord.Borders(:xlEdgeBottom).Weight << :xlThick
-			
+		
 		Cell_name.value << data[2].write_string	
 		Cell_desc.value << data[3].write_string
 		Cell_coord.value << data[4].write_string
 
 		_if data[9] = "OTB"
-		_then				
+		_then
+			Cell_tower.value << "Site ID: " + data[11].write_string + " /  Name: " + data[12].write_string
 			Cell_coord.Interior.ColorIndex << 41
 			Cell_desc.Interior.ColorIndex << 41
 			Cell_name.Interior.ColorIndex << 41
+			Cell_tower.Interior.ColorIndex << 41
 		_elif data[9] = "ODP"
 		_then
 			Cell_coord.Interior.ColorIndex << 36
 			Cell_desc.Interior.ColorIndex << 36
-			Cell_name.Interior.ColorIndex << 36
+			Cell_name.Interior.ColorIndex << 36		
 		_endif
 			
 		Cell_fiber << Sheet.Cells(8,kolom)
@@ -1486,24 +1509,24 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			
 			_if (i.as_number() _mod 6) = 1
 			_then
-				idx << 5 #blue
+				idx_back << 5 #blue
 			_elif (i.as_number() _mod 6) = 2
 			_then
-				idx << 46 #orange
+				idx_back << 46 #orange
 			_elif (i.as_number() _mod 6) = 3
 			_then
-				idx << 10 #green
+				idx_back << 10 #green
 			_elif (i.as_number() _mod 6) = 4
 			_then
-				idx << 9 #brown
+				idx_back << 9 #brown
 			_elif (i.as_number() _mod 6) = 5
 			_then
-				idx << 15 #abu-abu
+				idx_back << 15 #abu-abu
 			_elif (i.as_number() _mod 6) = 0
 			_then
-				idx << 2 #white
+				idx_back << 2 #white
 			_endif 				
-			fiber_num.Interior.ColorIndex << idx
+			fiber_num.Interior.ColorIndex << idx_back
 			
 			_if (i = ports)
 			_then
