@@ -963,16 +963,24 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		port_out << rope.new()
 		port_in << rope.new()
 		connected_cables << equality_set.new()
-		      
+		panel_description << equality_set.new()
+		
 		_for a_port _over a_bay.all_rme_port_components().fast_elements()
 		_loop
 			_if a_port.connected?
-			_then				
-				port? << _true 
+			_then
+				
+				port? << _true
+				
 				_for inout _over a_port.all_connections().fast_elements()
 				_loop
-					_try				
-						a << inout.destination_pin.description					
+					_try						
+						a << inout.destination_pin.description
+					#	write(inout.destination_pin.description)
+						in << inout.source_pin.description
+						out << inout.destination_pin.description
+						panel_description.add(in + "-" + out)
+						
 					_when does_not_understand
 						connected_cables.add(inout.destination_pin.owner)
 						port_out.add(a_port.description.as_number())
@@ -986,9 +994,11 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		_endloop
 		
 		port_out << simple_vector.new_from(port_out)
-
+	
 		port_in << simple_vector.new_from(port_in)
 
+		panel_description << simple_vector.new_from(panel_description)
+			
 		#check khusus last OTB, no next sheath_loc_spec
 		_if i.folders = towers.size.write_string
 		_then
@@ -1004,12 +1014,19 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 
 		_if connected_cables.size = 0
 		_then
-			.owner.show_alert("Ada kesalahan mendefinisikan urutan tower, tower yang terkoneksi ke OTB " + obj_t_closure.name +  " seharusnya merupakan tower terakhir")
+			.owner.show_alert("Fiberisasi belum dilakukan atau ada kesalahan mendefinisikan urutan tower, tower yang terkoneksi ke OTB " + obj_t_closure.name +  " seharusnya merupakan tower terakhir")
 			_return 
 		_endif 
 		
 		_for j _over connected_cables.fast_elements()
-		_loop			
+		_loop
+			_if j.source_collection.name _is :mit_slot
+			_then
+				write("cable connected: ",j)
+				_continue
+			_endif
+
+			write("cable connected: ",j)
 			current_cable << j
 			sheath_loc_coord << j.route_coordinates().coords
 		
@@ -1038,7 +1055,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 						#insert to tree
 						# obj_tree.add({tower.name, OTB Spec, OTB name, OTB coord, OTB
 						# fiber count, OTB fiber in, fiber out, Sheath LOC spec out}		
-							obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)),i.site_id, i.name, _unset  })
+							obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out, sheath_loc_spec, obj_t_closure.te_object_type, a_fc.format(j.calculated_sheath_length.value_in(:m)),i.site_id, i.name, panel_description })
 						_endif				
 					_endif 
 				_endif 
@@ -1048,9 +1065,11 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		_endloop 
 		
 		#scan ODP/Closure
+		#################
 		#reassignment menjadi rope lagi		
 		panel_out << rope.new()
 		panel_in << rope.new()
+		panel_direction << rope.new()
 		port_jml << 0		
 		obj_name << _unset
 		
@@ -1064,17 +1083,17 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 					 obj_name << data
 					 
 					 #in adalah current_cable								 
-
+					 cable_in_id << _unset 
 					  _for kabel _over obj_name.signal_cable_pins().fast_elements()
 					 _loop
 						 _if kabel.sheath_with_loc = current_cable
 						 _then
-							 write(obj_name.name)						 
+							 write(obj_name.name)
+							 _if kabel.all_connections().size > 0 _then cable_in_id << kabel.all_connections().an_element() _endif
+							 
 							 _for in _over kabel.all_connections().fast_elements()
 							 _loop
-								 #write("in: ",in)
-								 #write(in.pin1.cable_pin)
-								 #write(in.pin2.cable_pin)
+								 
 								 _for fiber_num _over range(in.pin1.act_low.as_number(), in.pin1.act_high.as_number())
 								 _loop									
 									 panel_in.add(fiber_num)
@@ -1090,11 +1109,31 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 						 _if kabel.sheath_with_loc = next_cable
 						 _then							 
 							 _for out _over kabel.all_connections().fast_elements()
-							 _loop								 
-								  _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
-								 _loop									 
-									 panel_out.add(fiber_num)
-								_endloop 
+							 _loop
+								  #Jika kabel current id = next cable id berarti itu sambungannya
+								
+								 _if out = cable_in_id
+								 _then
+									 
+									 #deteksi arah fiber (arrow direction)
+									 #jika act_low = act_high berarti satu fiber,
+									 #jika act_low <> act_high berarti ada beberapa fiber yang
+									 # berurutan (misal: Fibres, 1-2)
+									 
+									 _if out.pin2.act_low.as_number() <> out.pin2.act_high.as_number()
+									 _then
+										 #fiber berurutan
+										 _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
+										 _loop									 																		 panel_direction.add(fiber_num.write_string + "-" + fiber_num.write_string)
+										 _endloop
+									 _else
+										 #satu fiber
+										 panel_direction.add(out.pin1.act_low.write_string + "-" + out.pin2.act_low.write_string)
+									_endif 
+									_for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
+									_loop									 																	 panel_out.add(fiber_num)
+									_endloop
+								 _endif 
 							 _endloop				
 						  _endif 
 					 _endloop
@@ -1122,7 +1161,8 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		 _endloop
 		panel_out << simple_vector.new_from(panel_out)	
 		panel_in << simple_vector.new_from(panel_in)
-
+		panel_direction << simple_vector.new_from(panel_direction)
+	
 		#get koordinat objek
 		h << obj_name.location.coord		
 		w_conv << t.convert(h)
@@ -1132,7 +1172,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		koordinat << a_ff.format(latitud) + " " + a_ff.format(longitud)
 		sheath_loc_spec << next_cable.spec_id
 		
-		 obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(next_cable.calculated_sheath_length.value_in(:m)), _unset, _unset, _unset   })			
+		 obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(next_cable.calculated_sheath_length.value_in(:m)), _unset, _unset, panel_direction   })			
 	
 	
 		 ######################
@@ -1165,7 +1205,8 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				
 				panel_out << simple_vector.new_from(panel_out)
 				panel_in << simple_vector.new_from(panel_in)			 
-			 			 
+				panel_direction << simple_vector.new_from(panel_direction)					  
+							
 				h << obj_name.location.coord		
 				w_conv << t.convert(h)
 				latitud << w_conv.y
@@ -1180,7 +1221,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			 	pj_cable << next_cable.calculated_sheath_length.value_in(:m)				
 				sheath_loc_spec << next_cable.spec_id 				
 				
-				obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable), _unset, _unset, _unset })
+				obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable), _unset, _unset, panel_direction })
 				
 				pj_cable << 0
 				
@@ -1196,14 +1237,12 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				# tidak maka simpan next cable dan jumlahkan lengthnya
 				#jika ya langsung simpan ke obj_tree, lanjut looping 
 				_if obj_name _isnt _unset
-				_then
-					#write(obj_name.name)
-					#print(panel_in)
-					#print(panel_out)
+				_then					
 					panel_out << simple_vector.new_from(panel_out)
 					panel_in << simple_vector.new_from(panel_in)			 
 			 		panel_direction << simple_vector.new_from(panel_direction)
-					
+
+					#get koordinat objek
 					h << obj_name.location.coord		
 					w_conv << t.convert(h)
 					latitud << w_conv.y
@@ -1321,7 +1360,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	_for data _over obj_tree.fast_elements()
 	_loop
 
-		print(data[13])
+		#print(data[13])
 		
 		kolom << kolom + 4
 
@@ -1783,14 +1822,13 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 					 _endif
 				 _endloop
 						
-				#in
+				#in adalah current cable
 				 cable_in_id << _unset 
 				 _for kabel _over obj_name.signal_cable_pins().fast_elements()
 				 _loop
-					 #write("kabel: ",kabel)
+					 
 					 _if kabel.sheath_with_loc = current_cable
-					 _then
-						 #write("current: ",current_cable.name)					 
+					 _then										 
 
 						 _if kabel.all_connections().size > 0 _then cable_in_id << kabel.all_connections().an_element() _endif
 						 
@@ -1818,15 +1856,19 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 							 #Jika kabel current id = next cable id berarti itu sambungannya
 							_if out = cable_in_id
 							_then
-								
-								 _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
-								 _loop								
-									 _if (out.pin2.act_low.as_number() = fiber_num)
+								_if out.pin2.act_low.as_number() <> out.pin2.act_high.as_number()
 									 _then
-										panel_direction.add(out.pin1.act_low.write_string + "-" + fiber_num.write_string)
-									 _endif 
-									 panel_out.add(fiber_num)
-								 _endloop
+										 #fiber berurutan
+										 _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
+										 _loop									 																		 panel_direction.add(fiber_num.write_string + "-" + fiber_num.write_string)
+										 _endloop
+									 _else
+										 #satu fiber
+										 panel_direction.add(out.pin1.act_low.write_string + "-" + out.pin2.act_low.write_string)
+									_endif 
+									 _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
+									 _loop									 																		 panel_out.add(fiber_num)
+									 _endloop								 
 							_endif 
 						 _endloop				
 					  _endif 
