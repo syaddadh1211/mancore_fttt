@@ -922,7 +922,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_for i _over towers_asc.fast_elements()
 	_loop	
 
-		_if i.folders.as_number() = 2 _then _leave _endif
+	#	_if i.folders.as_number() = 3 _then _leave _endif
 
 		#scan sheath terdekat	
 		ff << 500		
@@ -970,24 +970,33 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			_if a_port.connected?
 			_then
 				
-				port? << _true
+				#port? << _true
 				
 				_for inout _over a_port.all_connections().fast_elements()
 				_loop
-					_try						
-						a << inout.destination_pin.description
-					#	write(inout.destination_pin.description)
-						in << inout.source_pin.description
+					_try
+						
+						a << inout.destination_pin.description				
+						in << inout.source_pin.description						
 						out << inout.destination_pin.description
+				
 						panel_description.add(in + "-" + out)
 						
 					_when does_not_understand
-						connected_cables.add(inout.destination_pin.owner)
-						port_out.add(a_port.description.as_number())
-						port? << _false 
+					
+						_if inout.destination_pin.owner.source_collection.name _is :mit_slot
+						_then
+							port_in.add(a_port.description.as_number())
+						_else
+							connected_cables.add(inout.destination_pin.owner)
+							port_out.add(a_port.description.as_number())
+						_endif 
+						
+					#	port? << _false 
 					_endtry 				
 				_endloop
-				_if port? _then port_in.add(a_port.description.as_number()) _endif 
+			#	write(a_port.description)
+			#	_if port? _then port_in.add(a_port.description.as_number()) _endif 
 				
 			_endif 
 			
@@ -998,7 +1007,11 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		port_in << simple_vector.new_from(port_in)
 
 		panel_description << simple_vector.new_from(panel_description)
-			
+
+		print(port_in)
+		print(port_out)
+		print(panel_description)
+		
 		#check khusus last OTB, no next sheath_loc_spec
 		_if i.folders = towers.size.write_string
 		_then
