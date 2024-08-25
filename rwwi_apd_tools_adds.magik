@@ -922,7 +922,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_for i _over towers_asc.fast_elements()
 	_loop	
 
-	#	_if i.folders.as_number() = 3 _then _leave _endif
+		_if i.folders.as_number() = 2 _then _leave _endif
 
 		#scan sheath terdekat	
 		ff << 500		
@@ -954,7 +954,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		
 		_if a_bay _isnt _unset
 		_then 
-			port_jml << a_bay.all_rme_port_components().size
+			port_jml << a_bay.all_rme_port_components()
 		_else
 			.owner.show_alert("Tidak terdeteksi adanya RME(Bay, Slot, Port) pada OTB: " + obj_t_closure.name )
 			_return 
@@ -965,17 +965,16 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		connected_cables << equality_set.new()
 		panel_description << equality_set.new()
 		
-		_for a_port _over a_bay.all_rme_port_components().fast_elements()
+		_for a_port _over a_bay.all_rme_port_components().as_sorted_collection().fast_elements()
 		_loop
+			#write(a_port.port_text_text, " ", a_port.id)
 			_if a_port.connected?
 			_then
-				
-				#port? << _true
-				
+			#	write("konek: ",a_port.port_text_text, " ", a_port.id)
 				_for inout _over a_port.all_connections().fast_elements()
 				_loop
 					_try
-						
+						#port to port
 						a << inout.destination_pin.description				
 						in << inout.source_pin.description						
 						out << inout.destination_pin.description
@@ -986,18 +985,23 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 					
 						_if inout.destination_pin.owner.source_collection.name _is :mit_slot
 						_then
-							port_in.add(a_port.description.as_number())
-						_else
-							connected_cables.add(inout.destination_pin.owner)
-							port_out.add(a_port.description.as_number())
-						_endif 
+							#kabel ke port (fiber kabel kiri)						
+							in << inout.source_pin.fiber_number
+							out << inout.destination_pin.port_text_text
+							port_in.add(in.write_string + "-" + out.write_string)
 						
-					#	port? << _false 
+						_else
+							#port ke kabel (fiber kabel kanan)
+							connected_cables.add(inout.destination_pin.owner)
+						
+							#port ke kabel
+							in << inout.source_pin.port_text_text
+							out << inout.destination_pin.fiber_number
+						
+							port_out.add(out.write_string + "-" + in.write_string)
+						_endif 
 					_endtry 				
-				_endloop
-			#	write(a_port.description)
-			#	_if port? _then port_in.add(a_port.description.as_number()) _endif 
-				
+				_endloop				
 			_endif 
 			
 		_endloop
@@ -1008,9 +1012,12 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 
 		panel_description << simple_vector.new_from(panel_description)
 
-		print(port_in)
-		print(port_out)
-		print(panel_description)
+#		write("IN")
+#		print(port_in)
+#		write("OUT")
+#		print(port_out)
+#		write("arrow")
+#		print(panel_description)
 		
 		#check khusus last OTB, no next sheath_loc_spec
 		_if i.folders = towers.size.write_string
@@ -1365,21 +1372,18 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	WorkBook << Workbooks.add(a_filename) 			
 	Sheet << WorkBook.Worksheets ("Man Core fttt")
 	
-	kolom << -1
+	kolom << -3
 	counter << 1
 	Cell_prj << Sheet.Cells(3,2)
 	Cell_prj.value << "Project/Design name: " + pj
 		
 	_for data _over obj_tree.fast_elements()
-	_loop
-
-		#print(data[13])
-		
-		kolom << kolom + 4
+	_loop				
+		kolom << kolom + 7
 
 		_if data[9] = "OTB"
 		_then
-			Cell_tower << Sheet.Cells(4,kolom) #B4
+			Cell_tower << Sheet.Cells(4,kolom) #C4
 			Cell_tower.Borders(:xlEdgeTop).LineStyle << :xlContinuous
 			Cell_tower.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 			Cell_tower.Borders(:xlEdgeRight).LineStyle << :xlContinuous
@@ -1387,7 +1391,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_tower.Borders(:xlEdgeLeft).Weight << :xlThick
 			Cell_tower.Borders(:xlEdgeRight).Weight << :xlThick
 		
-			Cell_name << Sheet.Cells(5,kolom) #B5
+			Cell_name << Sheet.Cells(5,kolom) #c5
 			#Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
 			Cell_name.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 			Cell_name.Borders(:xlEdgeRight).LineStyle << :xlContinuous
@@ -1395,7 +1399,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_name.Borders(:xlEdgeLeft).Weight << :xlThick
 			Cell_name.Borders(:xlEdgeRight).Weight << :xlThick
 		_else
-			Cell_name << Sheet.Cells(5,kolom) #B5
+			Cell_name << Sheet.Cells(5,kolom) #c5
 			Cell_name.Borders(:xlEdgeTop).LineStyle << :xlContinuous
 			Cell_name.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 			Cell_name.Borders(:xlEdgeRight).LineStyle << :xlContinuous
@@ -1442,187 +1446,262 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 		Cell_fiber.Borders(:xlEdgeRight).Weight << :xlThick
 		Cell_fiber.Borders(:xlEdgeBottom).Weight << :xlThick
 		Cell_fiber.HorizontalAlignment << :xlCenter
+		
 		_if data[9] = "OTB"		
 		_then
-			Cell_fiber.value << "Port Number (" + data[5].write_string + " port)"
+			Cell_fiber.value << "" + data[5].size.write_string + " port"
+
+			Cell_In << Sheet.Cells(8,kolom - 2)
+			Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeLeft).Weight << :xlThick
+			Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
+			Cell_In.HorizontalAlignment << :xlCenter
+			Cell_In << Sheet.Cells(8,kolom - 1)
+			Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeLeft).Weight << :xlThick
+			Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
+			Cell_In.HorizontalAlignment << :xlCenter
+			#Cell_In.value << "IN"
+
+			Cell_Out << Sheet.Cells(8,kolom + 1)
+			Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
+			Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
+			Cell_Out.HorizontalAlignment << :xlCenter
+			Cell_Out << Sheet.Cells(8,kolom + 2)
+			Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
+			Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
+			Cell_Out.HorizontalAlignment << :xlCenter
+			#Cell_Out.value << "OUT"
+			
+			Sheet.Cells(1, kolom).EntireColumn.Autofit
+			Sheet.Cells(1, kolom-1).Columnwidth << 5
+			Sheet.Cells(1, kolom+1).Columnwidth << 5
 		_else 
 			Cell_fiber.value << "Fiber Number (" + data[5].write_string + "c)"
+			Cell_In << Sheet.Cells(8,kolom - 1)
+			Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+			Cell_In.Borders(:xlEdgeLeft).Weight << :xlThick
+			Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
+			Cell_In.HorizontalAlignment << :xlCenter
+			#Cell_In.value << "IN"
+
+			Cell_Out << Sheet.Cells(8,kolom + 1)
+			Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
+			Cell_Out.Borders(:xlEdgeTop).Weight << :xlThick
+			Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
+			Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
+			Cell_Out.HorizontalAlignment << :xlCenter
+			#Cell_Out.value << "OUT"
+		
+			Sheet.Cells(1, kolom).EntireColumn.Autofit			
 		_endif 
-
-		Cell_In << Sheet.Cells(8,kolom - 1)
-		Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
-		Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
-		Cell_In.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
-		Cell_In.Borders(:xlEdgeLeft).Weight << :xlThick
-		Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
-		Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
-		Cell_In.HorizontalAlignment << :xlCenter
-		#Cell_In.value << "IN"
-
-		Cell_Out << Sheet.Cells(8,kolom + 1)
-		Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
-		Cell_Out.Borders(:xlEdgeRight).LineStyle << :xlContinuous
-		Cell_Out.Borders(:xlEdgeBottom).LineStyle << :xlContinuous
-		Cell_Out.Borders(:xlEdgeTop).Weight << :xlThick
-		Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
-		Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
-		Cell_Out.HorizontalAlignment << :xlCenter
-		#Cell_Out.value << "OUT"
-
-		Sheet.Cells(1, kolom).EntireColumn.Autofit
+		
 		pnl_in << 0
 		pnl_out << 0	
 		ports << 0
 		### looping sesuai yang connected aja jadi tidak terlalu banyak
 		## looping fiber numbernya
 		
+		#simpen data fiber to port, port to fiber dan port to port
+		otb_ports << equality_set.new()
+		
 		_if (data[6].size <> 0)
 		_then			
-			pnl_in << data[6].as_sorted_collection()		
+			pnl_in << data[6].as_sorted_collection()
+
+			_if data[9] = "OTB"		
+			_then
+				_for i _over pnl_in.fast_elements()
+				_loop
+					otb_ports.add(i)
+				_endloop
+			_endif
+			
 			pnl_in << pnl_in[pnl_in.size]
 		_endif
 		_if (data[7].size <> 0)
 		_then
 			pnl_out << data[7].as_sorted_collection()
+
+			_if data[9] = "OTB"		
+			_then
+				_for i _over pnl_out.fast_elements()
+				_loop
+					otb_ports.add(i)
+				_endloop
+			_endif
+			
 			pnl_out << pnl_out[pnl_out.size]
 		_endif
 
-		#tentukan banyaknya line yang dicreate
-	
-	#	_if counter <> obj_tree.size
-	#	_then		
-			
-			_if (pnl_in.as_number() > pnl_out.as_number())
-			_then							
-				ports << pnl_in.as_number()
-			_else
-				ports << pnl_out.as_number()
+		_if (data[13].size <> 0)
+		_then
+			pnl_desc << data[13].as_sorted_collection()
 
+			_if data[9] = "OTB"		
+			_then
+				_for i _over pnl_desc.fast_elements()
+				_loop
+					otb_ports.add(i)
+				_endloop
+			
 			_endif
-			counter +<< 1			
-	#	_else		
-	#		pnl_out << obj_tree[obj_tree.size][7].as_sorted_collection()
-	#		pnl_out << pnl_out[pnl_out.size]			
-	#		ports << pnl_out.as_number()		
+			
+		_endif
+
+		#seleksi lagi apakah port yang ada sudah terdaftar di list ?
+		#kalo ya maka abaikan (yang diambil data sebelah kanan setelah garis
+		# pemisah '-'
+		#contoh isi dari list:
+		#equality_set:
+		#"1-te" 
+		#"2-8" 
+		#"2-3"
+		otb_ports << otb_ports.as_sorted_collection()
+		otb_eq_ports << equality_set.new()
 		
-	#	_endif 
+		_for fiber_range _over otb_ports.fast_elements()
+		_loop
+			idx << fiber_range.index_of_seq("-")
+			fiber_left << fiber_range.slice(1,idx-1)
+			fiber_right << fiber_range.slice(idx+1, fiber_range.size)
+			otb_eq_ports.add(fiber_right)
+		_endloop 		
+		
+		#tentukan banyaknya line yang dicreate
+
+		_if (pnl_in.as_number() > pnl_out.as_number())
+		_then							
+			ports << pnl_in.as_number()
+		_else
+			ports << pnl_out.as_number()
+		_endif
+		
+		_if data[9] = "OTB"_then ports << data[5].size.as_number() _endif 	
+			
 		maks << 36
 		counter << 1
-		_for i _over range (1, ports)
-		_loop
-			j << i + 8
-			fiber_num << Sheet.Cells(j, kolom)
-			#fiber_num.value << i.write_string
-#			fiber_num.HorizontalAlignment << :xlCenter
-#			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
-#			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
-#			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
-#			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+			
+		_if data[9] = "OTB"
+		_then
+			_for i _over range (1, ports)
+			_loop			
+				j << i + 8
+				fiber_num << Sheet.Cells(j, kolom)
 
-			#memberi warna garis kiri dan kanan fiber number ikut bundle 1
+				#memberi warna garis kiri dan kanan fiber number ikut bundle 1
 			# (6 core) s/d 6 bundle)
-			_if (counter <> maks)
-			_then 
-				_if (counter < 7) #Bundle 1 - blue			
+				_if (counter <> maks)
+				_then 
+					_if (counter < 7) #Bundle 1 - blue			
+					_then
+						idx << 5 #Blue
+					_elif counter > 6 _and counter < 12
+					_then 
+						idx << 46 #orange
+					_elif counter > 12 _and counter < 19
+					_then 
+						idx << 10 #green
+					_elif counter > 18 _and counter < 25
+					_then 
+						idx << 9 #brown
+					_elif counter > 24 _and counter < 31
+					_then 
+						idx << 15 #Abu-abu
+					_elif counter > 30 _and counter < 37
+					_then 
+						idx << 2 #white
+					_endif
+					counter +<< 1
+				_else
+					counter << 1
+				_endif 
+				
+				fiber_num << Sheet.Cells(j,kolom-2)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx			
+				fiber_num.value << i.write_string
+
+				fiber_num << Sheet.Cells(j,kolom-1)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+
+				fiber_num << Sheet.Cells(j,kolom)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx				
+				fiber_num.value << data[5].as_sorted_collection().nth_element(i).description.write_string
+
+				fiber_num << Sheet.Cells(j,kolom+1)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+							
+				fiber_num << Sheet.Cells(j,kolom+2)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+				fiber_num.value << i.write_string
+
+				_if (i = ports)
 				_then
-					idx << 5 #Blue
-				_elif counter > 6 _and counter < 12
-				_then 
-					idx << 46 #orange
-				_elif counter > 12 _and counter < 19
-				_then 
-					idx << 10 #green
-				_elif counter > 18 _and counter < 25
-				_then 
-					idx << 9 #brown
-				_elif counter > 24 _and counter < 31
-				_then 
-					idx << 15 #Abu-abu
-				_elif counter > 30 _and counter < 37
-				_then 
-					idx << 2 #white
-				_endif
-				counter +<< 1
-			_else
-				counter << 1
-			_endif 
+					fiber_num << Sheet.Cells(j,kolom-2)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_num << Sheet.Cells(j,kolom-1)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_num << Sheet.Cells(j, kolom)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_num << Sheet.Cells(j,kolom+1)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_num << Sheet.Cells(j,kolom+2)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
 
-			fiber_num << Sheet.Cells(j,kolom-1)
-			fiber_num.HorizontalAlignment << :xlCenter
-			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
-			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
-			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
-			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
-			fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
-			fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
-			fiber_num.value << i.write_string
-
-#			_if (i.as_number() _mod 6) = 1
-#			_then
-#				idx_back << 5 #blue
-#			_elif (i.as_number() _mod 6) = 2
-#			_then
-#				idx_back << 46 #orange
-#			_elif (i.as_number() _mod 6) = 3
-#			_then
-#				idx_back << 10 #green
-#			_elif (i.as_number() _mod 6) = 4
-#			_then
-#				idx_back << 9 #brown
-#			_elif (i.as_number() _mod 6) = 5
-#			_then
-#				idx_back << 15 #abu-abu
-#			_elif (i.as_number() _mod 6) = 0
-#			_then
-#				idx_back << 2 #white
-#			_endif 				
-#			fiber_num.Interior.ColorIndex << idx_back
-					
-			fiber_num << Sheet.Cells(j,kolom+1)
-			fiber_num.HorizontalAlignment << :xlCenter
-			fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
-			fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
-			fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
-			fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
-			fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
-			fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
-			fiber_num.value << i.write_string
-			
-#			_if (i.as_number() _mod 6) = 1
-#			_then
-#				idx_back << 5 #blue
-#			_elif (i.as_number() _mod 6) = 2
-#			_then
-#				idx_back << 46 #orange
-#			_elif (i.as_number() _mod 6) = 3
-#			_then
-#				idx_back << 10 #green
-#			_elif (i.as_number() _mod 6) = 4
-#			_then
-#				idx_back << 9 #brown
-#			_elif (i.as_number() _mod 6) = 5
-#			_then
-#				idx_back << 15 #abu-abu
-#			_elif (i.as_number() _mod 6) = 0
-#			_then
-#				idx_back << 2 #white
-#			_endif 				
-#			fiber_num.Interior.ColorIndex << idx_back
-			
-			_if (i = ports)
-			_then
-				fiber_num << Sheet.Cells(j,kolom-1)			
-				fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
-				fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
-				fiber_num << Sheet.Cells(j, kolom)			
-				fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
-				fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
-				fiber_num << Sheet.Cells(j,kolom+1)			
-				fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
-				fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
-
-				_if data[9] = "OTB"
-				_then
 					pj_cable << 0
 					#jumlahkan total length tiap tower
 					_for tower _over obj_tree.fast_elements()
@@ -1634,105 +1713,349 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 					_endloop 
 					Cell_total_pj_cable << Sheet.Cells(j+2,kolom)
 					Cell_total_pj_cable.value << "Total Cable Length: "
-					Cell_total_pj_cable << Sheet.Cells(j+2,kolom+1)
+					Cell_total_pj_cable << Sheet.Cells(j+2,kolom+2)
 					Cell_total_pj_cable.value << a_fc.format(pj_cable).write_string + " m"
-				_endif 			
-			_endif 
-		_endloop 
+				_endif
+
+				_for in _over data[6].fast_elements()
+				_loop
+				# default satu bundle adalah 6 warna
+					j << in.as_number() + 8
+					_if (in.as_number() _mod 6) = 1
+					_then
+						idx << 5 #blue
+					_elif (in.as_number() _mod 6) = 2
+					_then
+						idx << 46 #orange
+					_elif (in.as_number() _mod 6) = 3
+					_then
+						idx << 10 #green
+					_elif (in.as_number() _mod 6) = 4
+					_then
+						idx << 9 #brown
+					_elif (in.as_number() _mod 6) = 5
+					_then
+						idx << 15 #abu-abu
+					_elif (in.as_number() _mod 6) = 0
+					_then
+						idx << 20 #white
+					_endif 
+				
+					fiber_num << Sheet.Cells(j, kolom-2)			
+					fiber_num.Interior.ColorIndex << idx		
+			
+				_endloop
+			
+				_for out _over data[7].fast_elements()
+				_loop
+				# default satu bundle adalah 6 warna
+					j << out.as_number() + 8
+					_if (out.as_number() _mod 6) = 1
+					_then
+						idx << 5 #blue
+					_elif (out.as_number() _mod 6) = 2
+					_then
+						idx << 46 #orange
+					_elif (out.as_number() _mod 6) = 3
+					_then
+						idx << 10 #green
+					_elif (out.as_number() _mod 6) = 4
+					_then
+						idx << 9 #brown
+					_elif (out.as_number() _mod 6) = 5
+					_then
+						idx << 15 #abu-abu
+					_elif (out.as_number() _mod 6) = 0
+					_then
+						idx << 20 #white
+					_endif 
+				
+					fiber_num << Sheet.Cells(j, kolom+2)			
+					fiber_num.Interior.ColorIndex << idx
+				_endloop			
+
+				_for out _over otb_eq_ports.fast_elements()
+				_loop					
+				# default satu bundle adalah 6 warna
+					
+					port_number << 0					
+
+					_for i _over data[5].as_sorted_collection().fast_elements()
+					_loop
+						_if i.description = out
+						_then
+							_leave  
+						_else
+							port_number +<< 1
+						_endif							
+					_endloop
+
+					j << port_number + 8
+						
+					_if ((port_number+1) _mod 6) = 1
+					_then
+						idx << 5 #blue
+					_elif ((port_number+1) _mod 6) = 2
+					_then
+						idx << 46 #orange
+					_elif ((port_number+1) _mod 6) = 3
+					_then
+						idx << 10 #green
+					_elif ((port_number+1) _mod 6) = 4
+					_then
+						idx << 9 #brown
+					_elif ((port_number+1) _mod 6) = 5
+					_then
+						idx << 15 #abu-abu
+					_elif ((port_number+1) _mod 6) = 0
+					_then
+						idx << 20 #white						
+					_endif 
+			
+					fiber_num << Sheet.Cells(j+1, kolom)			
+					fiber_num.Interior.ColorIndex << idx
+						
+				_endloop
+
+				_for fiber_range _over data[6].as_sorted_collection().fast_elements()
+				_loop
+					idx1 << fiber_range.index_of_seq("-")
+					fiber_left << fiber_range.slice(1,idx1-1)
+					fiber_right << fiber_range.slice(idx1+1, fiber_range.size)
+					j1 << fiber_left.as_number() + 8
+
+					port_number << 0					
+
+					_for i _over data[5].as_sorted_collection().fast_elements()
+					_loop
+						_if i.description = fiber_right
+						_then
+							_leave  
+						_else
+							port_number +<< 1
+						_endif							
+					_endloop
+
+					j2 << (port_number+1) + 8
+					
+					titik_awal << Sheet.Cells(j1,kolom-2)			
+					titik_akhir << Sheet.Cells(j2,kolom)
+					garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+					garis.line.ForeColor.SchemeColor << 0  #0= hitam
+					garis.line.weight << 2
+					garis.line.BeginArrowheadStyle << 6
+					garis.line.EndArrowheadStyle << 6
+				_endloop 
+
+				_for fiber_range _over data[7].as_sorted_collection().fast_elements()
+				_loop
+					idx1 << fiber_range.index_of_seq("-")
+					fiber_left << fiber_range.slice(1,idx1-1)
+					fiber_right << fiber_range.slice(idx1+1, fiber_range.size)
+					j1 << fiber_left.as_number() + 8
+
+					port_number << 0					
+
+					_for i _over data[5].as_sorted_collection().fast_elements()
+					_loop
+						_if i.description = fiber_right
+						_then
+							_leave  
+						_else
+							port_number +<< 1
+						_endif							
+					_endloop
+
+					j2 << (port_number+1) + 8
+					
+					titik_awal << Sheet.Cells(j2,kolom) 
+					titik_akhir << Sheet.Cells(j1,kolom+2)		
+					garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+					garis.line.ForeColor.SchemeColor << 0  #0= hitam
+					garis.line.weight << 2
+					garis.line.BeginArrowheadStyle << 6
+					garis.line.EndArrowheadStyle << 6
+				_endloop
+				
+				_if data[8] _isnt _unset 
+				_then
+					fiber_cable_line << data[7].as_sorted_collection()
+				
+					#fiber_cable_line << (fiber_cable_line[fiber_cable_line.size] _div 2) + 8 # agar selalu tergambar di tengah
+					fiber_cable_line << 9
+					fiber_cable << Sheet.Cells(fiber_cable_line, kolom+3)
+					fiber_cable.Interior.Pattern << :xlSolid
+					fiber_cable.Borders(:xlEdgeBottom).LineStyle << :xlDouble
+					fiber_cable.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_cable.value << data[8].write_string
+					fiber_cable << Sheet.Cells(fiber_cable_line+1, kolom+3)
+					fiber_cable.value << "Length: " + data[10].default(0).write_string + " m"
+			
+					Sheet.Columns(kolom+3).EntireColumn.Autofit #Column E
+				_endif
+			
+			_endloop 
+		_else
+			_for i _over range (1, ports)
+			_loop			
+				j << i + 8
+				fiber_num << Sheet.Cells(j, kolom)		
+
+			#memberi warna garis kiri dan kanan fiber number ikut bundle 1
+			# (6 core) s/d 6 bundle)
+				_if (counter <> maks)
+				_then 
+					_if (counter < 7) #Bundle 1 - blue			
+					_then
+						idx << 5 #Blue
+					_elif counter > 6 _and counter < 12
+					_then 
+						idx << 46 #orange
+					_elif counter > 12 _and counter < 19
+					_then 
+						idx << 10 #green
+					_elif counter > 18 _and counter < 25
+					_then 
+						idx << 9 #brown
+					_elif counter > 24 _and counter < 31
+					_then 
+						idx << 15 #Abu-abu
+					_elif counter > 30 _and counter < 37
+					_then 
+						idx << 2 #white
+					_endif
+					counter +<< 1
+				_else
+					counter << 1
+				_endif 
+
+				fiber_num << Sheet.Cells(j,kolom-2)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+				fiber_num.value << i.write_string			
+				
+				fiber_num << Sheet.Cells(j,kolom+2)
+				fiber_num.HorizontalAlignment << :xlCenter
+				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeRight).LineStyle << :xlContinuous
+				fiber_num.Borders(:xlEdgeLeft).Weight << :xlThick
+				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
+				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
+				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+				fiber_num.value << i.write_string
+			
+				_if (i = ports)
+				_then
+					fiber_num << Sheet.Cells(j,kolom-1)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_num << Sheet.Cells(j, kolom)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+					fiber_num << Sheet.Cells(j,kolom+1)			
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick		
+				_endif 
+			_endloop 
 		
-		_for in _over data[6].fast_elements()
-		_loop
-			# default satu bundle adalah 6 warna
-			j << in.as_number() + 8
-			_if (in.as_number() _mod 6) = 1
-			_then
-				idx << 5 #blue
-			_elif (in.as_number() _mod 6) = 2
-			_then
-				idx << 46 #orange
-			_elif (in.as_number() _mod 6) = 3
-			_then
-				idx << 10 #green
-			_elif (in.as_number() _mod 6) = 4
-			_then
-				idx << 9 #brown
-			_elif (in.as_number() _mod 6) = 5
-			_then
-				idx << 15 #abu-abu
-			_elif (in.as_number() _mod 6) = 0
-			_then
-				idx << 20 #white
-			_endif 
+			_for in _over data[6].fast_elements()
+			_loop
+				# default satu bundle adalah 6 warna
+				j << in.as_number() + 8
+				_if (in.as_number() _mod 6) = 1
+				_then
+					idx << 5 #blue
+				_elif (in.as_number() _mod 6) = 2
+				_then
+					idx << 46 #orange
+				_elif (in.as_number() _mod 6) = 3
+				_then
+					idx << 10 #green
+				_elif (in.as_number() _mod 6) = 4
+				_then
+					idx << 9 #brown
+				_elif (in.as_number() _mod 6) = 5
+				_then
+					idx << 15 #abu-abu
+				_elif (in.as_number() _mod 6) = 0
+				_then
+					idx << 20 #white
+				_endif 
 				
-			fiber_num << Sheet.Cells(j, kolom-1)			
-			fiber_num.Interior.ColorIndex << idx
+				fiber_num << Sheet.Cells(j, kolom-1)			
+				fiber_num.Interior.ColorIndex << idx			
 			
+			_endloop
 			
-		_endloop
-		_for out _over data[7].fast_elements()
-		_loop
-			# default satu bundle adalah 6 warna
-			j << out.as_number() + 8
-			_if (out.as_number() _mod 6) = 1
-			_then
-				idx << 5 #blue
-			_elif (out.as_number() _mod 6) = 2
-			_then
-				idx << 46 #orange
-			_elif (out.as_number() _mod 6) = 3
-			_then
-				idx << 10 #green
-			_elif (out.as_number() _mod 6) = 4
-			_then
-				idx << 9 #brown
-			_elif (out.as_number() _mod 6) = 5
-			_then
-				idx << 15 #abu-abu
-			_elif (out.as_number() _mod 6) = 0
-			_then
-				idx << 20 #white
-			_endif 
+			_for out _over data[7].fast_elements()
+			_loop
+				# default satu bundle adalah 6 warna
+				j << out.as_number() + 8
+				_if (out.as_number() _mod 6) = 1
+				_then
+					idx << 5 #blue
+				_elif (out.as_number() _mod 6) = 2
+				_then
+					idx << 46 #orange
+				_elif (out.as_number() _mod 6) = 3
+				_then
+					idx << 10 #green
+				_elif (out.as_number() _mod 6) = 4
+				_then
+					idx << 9 #brown
+				_elif (out.as_number() _mod 6) = 5
+				_then
+					idx << 15 #abu-abu
+				_elif (out.as_number() _mod 6) = 0
+				_then
+					idx << 20 #white
+				_endif 
 				
-			fiber_num << Sheet.Cells(j, kolom+1)			
-			fiber_num.Interior.ColorIndex << idx
-		_endloop
+				fiber_num << Sheet.Cells(j, kolom+1)			
+				fiber_num.Interior.ColorIndex << idx
+			_endloop
 
 		#gambar garis antar fiber number
-		_if data[13] _isnt _unset
-		_then 
-			_for fiber_range _over data[13].fast_elements()
-			_loop
-				idx << fiber_range.index_of_seq("-")
-				fiber_left << fiber_range.slice(1,idx-1)
-				fiber_right << fiber_range.slice(idx+1, fiber_range.size)
-				j1 << fiber_left.as_number() + 8
-				j2 << fiber_right.as_number() + 8
-				titik_awal << Sheet.Cells(j1,kolom-1)			
-				titik_akhir << Sheet.Cells(j2,kolom+1)
-				garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
-				garis.line.ForeColor.SchemeColor << 0  #0= hitam
-				garis.line.weight << 2
-				garis.line.BeginArrowheadStyle << 6
-				garis.line.EndArrowheadStyle << 6
-			_endloop 
-		_endif
+			_if data[13] _isnt _unset
+			_then 
+				_for fiber_range _over data[13].fast_elements()
+				_loop
+					idx << fiber_range.index_of_seq("-")
+					fiber_left << fiber_range.slice(1,idx-1)
+					fiber_right << fiber_range.slice(idx+1, fiber_range.size)
+					j1 << fiber_left.as_number() + 8
+					j2 << fiber_right.as_number() + 8
+					titik_awal << Sheet.Cells(j1,kolom-2)			
+					titik_akhir << Sheet.Cells(j2,kolom+2)
+					garis << Sheet.Shapes.AddConnector(1, (titik_awal.left + titik_awal.width), (titik_awal.top + (titik_awal.height/2))  ,titik_akhir.left, (titik_akhir.top + (titik_akhir.height/2)))
+					garis.line.ForeColor.SchemeColor << 0  #0= hitam
+					garis.line.weight << 2
+					garis.line.BeginArrowheadStyle << 6
+					garis.line.EndArrowheadStyle << 6
+				_endloop 
+			_endif
 		
-		_if data[8] _isnt _unset 
-		_then
-			fiber_cable_line << data[7].as_sorted_collection() 
-			#fiber_cable_line << (fiber_cable_line[fiber_cable_line.size] _div 2) + 8 # agar selalu tergambar di tengah
-			fiber_cable_line << 9
-			fiber_cable << Sheet.Cells(fiber_cable_line, kolom+2)
-			fiber_cable.Interior.Pattern << :xlSolid
-			fiber_cable.Borders(:xlEdgeBottom).LineStyle << :xlDouble
-			fiber_cable.Borders(:xlEdgeBottom).Weight << :xlThick
-			fiber_cable.value << data[8].write_string
-			fiber_cable << Sheet.Cells(fiber_cable_line+1, kolom+2)
-			fiber_cable.value << "Length: " + data[10].default(0).write_string + " m"
+			_if data[8] _isnt _unset 
+			_then
+				fiber_cable_line << data[7].as_sorted_collection() 
+				#fiber_cable_line << (fiber_cable_line[fiber_cable_line.size] _div 2) + 8 # agar selalu tergambar di tengah
+				fiber_cable_line << 9
+				fiber_cable << Sheet.Cells(fiber_cable_line, kolom+2)
+				fiber_cable.Interior.Pattern << :xlSolid
+				fiber_cable.Borders(:xlEdgeBottom).LineStyle << :xlDouble
+				fiber_cable.Borders(:xlEdgeBottom).Weight << :xlThick
+				fiber_cable.value << data[8].write_string
+				fiber_cable << Sheet.Cells(fiber_cable_line+1, kolom+2)
+				fiber_cable.value << "Length: " + data[10].default(0).write_string + " m"
 			
-			Sheet.Columns(kolom+2).EntireColumn.Autofit #Column E
-		_endif	
-			
+				Sheet.Columns(kolom+2).EntireColumn.Autofit #Column E
+			_endif	
+		_endif 	
 	_endloop
 
 	Excel_Object.Visible << _True
