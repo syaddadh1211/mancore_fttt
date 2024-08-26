@@ -925,7 +925,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_for i _over towers_asc.fast_elements()
 	_loop	
 
-		_if i.folders.as_number() = 3 _then _leave _endif
+		#_if i.folders.as_number() = 3 _then _leave _endif
 
 		#scan sheath terdekat	
 		ff << 500		
@@ -1618,12 +1618,13 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 
 				#memberi warna garis kiri dan kanan fiber number ikut bundle 1
 			# (6 core) s/d 6 bundle)
+
 				_if (counter <> maks)
 				_then 
 					_if (counter < 7) #Bundle 1 - blue			
 					_then
 						idx << 5 #Blue
-					_elif counter > 6 _and counter < 12
+					_elif counter > 6 _and counter < 13
 					_then 
 						idx << 46 #orange
 					_elif counter > 12 _and counter < 19
@@ -1637,7 +1638,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 						idx << 15 #Abu-abu
 					_elif counter > 30 _and counter < 37
 					_then 
-						idx << 2 #white
+						idx << 20 #white
 					_endif
 					counter +<< 1
 				_else
@@ -1671,10 +1672,8 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
 				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
 				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
-				_if i < ports _then
-					fiber_num.value << data[5].as_sorted_collection().nth_element(i).description.write_string
-				_else
-					write(i)
+				_if i <= ports _then				
+					_if data[5].as_sorted_collection().nth_element(i) _isnt _unset _then fiber_num.value << data[5].as_sorted_collection().nth_element(i).description.write_string _endif 
 				_endif 
 
 				fiber_num << Sheet.Cells(j,kolom+1)
@@ -1728,8 +1727,6 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 					Cell_total_pj_cable << Sheet.Cells(j+2,kolom+2)
 					Cell_total_pj_cable.value << a_fc.format(pj_cable).write_string + " m"
 				_endif
-
-				idx << _unset
 				
 				_for in _over data[6].fast_elements()
 				_loop
@@ -1760,7 +1757,6 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			
 				_endloop
 
-				idx << _unset 
 				_for out _over data[7].fast_elements()
 				_loop
 				# default satu bundle adalah 6 warna
@@ -1788,8 +1784,6 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 					fiber_num << Sheet.Cells(j, kolom+2)			
 					fiber_num.Interior.ColorIndex << idx
 				_endloop			
-
-				idx << _unset
 				
 				_for out _over otb_eq_ports.fast_elements()
 				_loop					
@@ -1833,9 +1827,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 					fiber_num.Interior.ColorIndex << idx
 						
 				_endloop
-
-				idx1 << _unset
-				
+						
 				_for fiber_range _over data[6].as_sorted_collection().fast_elements()
 				_loop
 					idx1 << fiber_range.index_of_seq("-")
@@ -1865,8 +1857,6 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 					garis.line.BeginArrowheadStyle << 6
 					garis.line.EndArrowheadStyle << 6
 				_endloop 
-
-				idx1 << _unset
 				
 				_for fiber_range _over data[7].as_sorted_collection().fast_elements()
 				_loop
@@ -1931,7 +1921,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 					_if (counter < 7) #Bundle 1 - blue			
 					_then
 						idx << 5 #Blue
-					_elif counter > 6 _and counter < 12
+					_elif counter > 6 _and counter < 13
 					_then 
 						idx << 46 #orange
 					_elif counter > 12 _and counter < 19
