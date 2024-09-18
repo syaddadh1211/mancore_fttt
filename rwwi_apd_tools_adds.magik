@@ -925,8 +925,8 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 	_for i _over towers_asc.fast_elements()
 	_loop	
 
-		#_if i.folders.as_number() = 3 _then _leave _endif
-
+	#	_if i.folders.as_number() = 3 _then _leave _endif
+	
 		#scan sheath terdekat	
 		ff << 500		
 		(s_sheath,obj_sheath) << _self.scan_sheath(i.location,ff)
@@ -969,11 +969,9 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		panel_description << equality_set.new()
 		
 		_for a_port _over a_bay.all_rme_port_components().as_sorted_collection().fast_elements()
-		_loop
-			#write(a_port.port_text_text, " ", a_port.id)
+		_loop			
 			_if a_port.connected?
 			_then
-			#	write("konek: ",a_port.port_text_text, " ", a_port.id)
 				_for inout _over a_port.all_connections().fast_elements()
 				_loop
 					_try
@@ -1019,7 +1017,12 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 		_if i.folders = towers.size.write_string
 		_then		
 			obj_tree.add({i.folders, obj_t_closure.spec_id, obj_t_closure.name, koordinat, port_jml, port_in, port_out , _unset, obj_t_closure.te_object_type, 0, i.site_id, i.name, panel_description  })
-			_leave 
+#				_for i _over obj_tree.fast_elements()
+#				_loop
+#					write("obyek: ",i[3])
+#				_endloop
+					
+			_leave 		
 		_endif 
 
 		#looping cables yang terhubung dengan OTB mencari kabel yang
@@ -1042,7 +1045,6 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				_continue
 			_endif
 
-			write("cable connected: ",j)
 			current_cable << j
 			sheath_loc_coord << j.route_coordinates().coords
 		
@@ -1213,7 +1215,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 			# dari design ketemu obyek Closure/ODP dan nempel ke  kabel yang eksisting
 			# Jika next cablenya eksisting maka cari di database
 			# eksisting bukan di design yang ada
-				 write(next_cable.calculated_sheath_length.value_in(:m))
+			#	 write("panjang sebelum masuk fungsi eksisting: ", next_cable.calculated_sheath_length.value_in(:m))
 				 _if next_cable.construction_status = "In Service"
 				 _then
 					 (s_t_closure, obj_t_closure, obj_name, panel_in, panel_out, port_jml, next_cable, panel_direction) << _self.cek_existing_cable(next_cable, panel_in, panel_out, port_jml, panel_direction,v)					
@@ -1239,20 +1241,16 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 					
 					obj_tree.add({i.folders, obj_name.spec_id, obj_name.name, koordinat, port_jml, panel_in, panel_out, sheath_loc_spec, obj_name.sheath_splice_object_type, a_fc.format(pj_cable), _unset, _unset, panel_direction})
 					
-					pj_cable << 0
-					
-					_for i _over obj_tree.fast_elements()
-					_loop
-						write("nama obyek di tree: ",i[3])
-					_endloop
-
+					pj_cable << 0				
+				
 					_continue 
 					
-				_else
-					 .owner.show_alert("Terdeteksi ada kabel yang belum tergambar di penghujung kabel " +  next_cable.name)				 
-					 _leave
-				 _endif
-				 
+				 _else
+					
+						.owner.show_alert("Terdeteksi ada kabel yang belum tergambar di penghujung kabel " +  next_cable.name)
+						_leave
+				
+				 _endif 
 			 _endif
 		
 			 #next OTB = true then selesai
@@ -1292,7 +1290,7 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				# dan masih perlu dicek next cablenya apakah langsung ketemu object, jika
 				# tidak maka simpan next cable dan jumlahkan lengthnya
 				#jika ya langsung simpan ke obj_tree, lanjut looping
-			write("ketemu no otb: ",obj_name.name)
+		
 				_if obj_name _isnt _unset
 				_then					
 					panel_out << simple_vector.new_from(panel_out)
@@ -1354,12 +1352,14 @@ _method rwwi_apd_tools_dialog.cek_fttt()
 				_endif			
 			_endif		
 		 _endloop
-		 
+		
 	_endloop
 
-	#_return 
-	
-#	_self.export_to_excel(obj_tree, pj)	
+#	_for i _over obj_tree.fast_elements()
+#	_loop
+#		print(i)
+#	_endloop 
+	_self.export_to_excel(obj_tree, pj)	
 
 	time_consuming << date_time_now() - start
 	
@@ -1370,11 +1370,9 @@ $
 _method rwwi_apd_tools_dialog.cek_existing_cable(next_cable, panel_in, panel_out, port_jml, panel_direction, v)
 	
 	splices << v.collections[:sheath_splice]
-	write("function: ", next_cable.calculated_sheath_length.value_in(:m))
-	
 	sheath_loc_coord << next_cable.route_coordinates().coords
 	current_cable << next_cable
-
+	#write("cek eksisting?")
 	_for data _over splices.fast_elements()
 	_loop
 				 
@@ -1384,17 +1382,13 @@ _method rwwi_apd_tools_dialog.cek_existing_cable(next_cable, panel_in, panel_out
 			 _if sheath_loc_coord.last = data.location.coord 
 			 _then				  	
 				 obj_name << data
-			#	write("function ", obj_name.name)
+			
 				 #looping cable2 yang nempel di object
 				 _for loc _over obj_name.mit_sheath_with_loc_pins.fast_elements()
 				 _loop
 					 next_cable_coord << loc.sheath_with_loc.route_coordinates().coords
 					 _if next_cable_coord.first = data.location.coord
 					 _then															
-#						 #scan OTB terdekat, if yes then exit
-#						 ff << 100
-#						 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)
-#						
 						 next_cable << loc.sheath_with_loc						
 						 _leave							
 					 _endif
@@ -1476,7 +1470,7 @@ _method rwwi_apd_tools_dialog.cek_existing_cable(next_cable, panel_in, panel_out
 	_endloop	
 
 #	>> s_t_closure, obj_t_closure, obj_name, panel_in, panel_out, port_jml, next_cable, panel_direction
-	write("function: ", obj_name.name)
+
 	>> _false, _unset, obj_name, panel_in, panel_out, port_jml, next_cable, panel_direction
 	
 _endmethod 
@@ -1498,11 +1492,16 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 	
 	kolom << -1
 	counter << 1
+	### ini counter untuk info jumlah core fiber
+	baris << 0
+	###
 	Cell_prj << Sheet.Cells(3,2)
 	Cell_prj.value << "Project/Design name: " + pj
 		
 	_for data _over obj_tree.fast_elements()
-	_loop					
+	_loop
+		baris +<< 1
+		
 		_if data[9] = "OTB"
 		_then
 			kolom << kolom + 6
@@ -1583,6 +1582,12 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
 			Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
 			Cell_In.HorizontalAlignment << :xlCenter
+			_if baris > 1
+			_then
+				core << obj_tree[baris-1][8].numbers_and_strings
+				Cell_In.value << core[2].write_string + " Core"
+			_endif 
+						
 			Cell_In << Sheet.Cells(8,kolom - 1)
 			Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 			Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
@@ -1590,8 +1595,7 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_In.Borders(:xlEdgeLeft).Weight << :xlThick
 			Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
 			Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
-			Cell_In.HorizontalAlignment << :xlCenter
-			#Cell_In.value << "IN"
+			Cell_In.HorizontalAlignment << :xlCenter			
 
 			Cell_Out << Sheet.Cells(8,kolom + 1)
 			Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
@@ -1609,13 +1613,16 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
 			Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
 			Cell_Out.HorizontalAlignment << :xlCenter
-			#Cell_Out.value << "OUT"
-			
+			_if baris < obj_tree.size
+			_then
+				core << data[8].numbers_and_strings
+				Cell_Out.value << core[2].write_string + " Core"
+			_endif 
 			Sheet.Cells(1, kolom).EntireColumn.Autofit
 			Sheet.Cells(1, kolom-1).Columnwidth << 5
 			Sheet.Cells(1, kolom+1).Columnwidth << 5
 		_else 
-			Cell_fiber.value << "Fiber Number (" + data[5].write_string + "c)"
+			#Cell_fiber.value << "Fiber Number (" + data[5].write_string + "c)"
 			Cell_In << Sheet.Cells(8,kolom - 1)
 			Cell_In.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
 			Cell_In.Borders(:xlEdgeTop).LineStyle << :xlContinuous
@@ -1624,7 +1631,8 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_In.Borders(:xlEdgeTop).Weight << :xlThick
 			Cell_In.Borders(:xlEdgeBottom).Weight << :xlThick
 			Cell_In.HorizontalAlignment << :xlCenter
-			#Cell_In.value << "IN"
+			core << obj_tree[baris-1][8].numbers_and_strings
+			Cell_In.value << core[2].write_string + " Core"
 
 			Cell_Out << Sheet.Cells(8,kolom + 1)
 			Cell_Out.Borders(:xlEdgeTop).LineStyle << :xlContinuous
@@ -1634,7 +1642,8 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 			Cell_Out.Borders(:xlEdgeRight).Weight << :xlThick
 			Cell_Out.Borders(:xlEdgeBottom).Weight << :xlThick
 			Cell_Out.HorizontalAlignment << :xlCenter
-			#Cell_Out.value << "OUT"
+			core << data[8].numbers_and_strings
+			Cell_Out.value << core[2].write_string + " Core"
 		
 			Sheet.Cells(1, kolom).EntireColumn.Autofit			
 		_endif 
@@ -1778,6 +1787,14 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick				
 				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
 				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+
+				#kasih pembatas antar bundle (garis hitam)
+				_if counter _mod 6 = 1
+				_then
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				_endif
+					
 				_if i <= pnl_in.as_number() _then fiber_num.value << i.write_string.default("") _endif 
 
 				fiber_num << Sheet.Cells(j,kolom-1)
@@ -1797,6 +1814,14 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
 				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
 				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+
+				#kasih pembatas antar bundle (garis hitam)
+				_if counter _mod 6 = 1
+				_then
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				_endif
+				
 				_if i <= ports _then				
 					_if data[5].as_sorted_collection().nth_element(i) _isnt _unset _then fiber_num.value << data[5].as_sorted_collection().nth_element(i).description.write_string _endif 
 				_endif 
@@ -1818,6 +1843,14 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
 				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
 				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+
+					#kasih pembatas antar bundle (garis hitam)
+				_if counter _mod 6 = 1
+				_then
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				_endif
+				
 				_if i <= pnl_out.as_number() _then fiber_num.value << i.write_string.default("") _endif  
 
 				_if (i = ports)
@@ -2075,8 +2108,16 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick
 				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
 				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
-				fiber_num.value << i.write_string			
+
+				#kasih pembatas antar bundle (garis hitam)
+				_if counter _mod 6 = 1
+				_then
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				_endif 
 				
+				fiber_num.value << i.write_string	
+								
 				fiber_num << Sheet.Cells(j,kolom+1)
 				fiber_num.HorizontalAlignment << :xlCenter
 				fiber_num.Borders(:xlEdgeLeft).LineStyle << :xlContinuous
@@ -2085,6 +2126,13 @@ _method rwwi_apd_tools_dialog.export_to_excel(obj_tree, pj)
 				fiber_num.Borders(:xlEdgeRight).Weight << :xlThick			
 				fiber_num.Borders(:xlEdgeLeft).ColorIndex << idx 
 				fiber_num.Borders(:xlEdgeRight).ColorIndex << idx
+
+				#kasih pembatas antar bundle (garis hitam)
+				_if counter _mod 6 = 1
+				_then
+					fiber_num.Borders(:xlEdgeBottom).LineStyle << :xlContinuous			
+					fiber_num.Borders(:xlEdgeBottom).Weight << :xlThick
+				_endif 
 				fiber_num.value << i.write_string
 			
 				_if (i = ports)
@@ -2276,7 +2324,9 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 	
 	sheath_loc_coord << next_cable.route_coordinates().coords
 	current_cable << next_cable
-	
+
+	#write("current: ", current_cable.calculated_sheath_length.value_in(:m))
+
 	_for data _over splices.fast_elements()
 	_loop
 				 
@@ -2286,19 +2336,66 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 			 _if sheath_loc_coord.last = data.location.coord 
 			 _then					
 				 obj_name << data
-				 write("obyek design: ", obj_name.name)
-				 #looping cable2 yang nempel di object
-				 _for loc _over obj_name.mit_sheath_with_loc_pins.fast_elements()
+				 write(obj_name.name)						
+			 
+				#bisa buat greenfield dan syncron cable, tapi khusus syncron gak detek akhir odp		
+				 jml_cable_out << 0
+				 cable_out << rope.new()
+				_for loc _over obj_name.get_connected_cables().fast_elements()
 				 _loop
-					 next_cable_coord << loc.sheath_with_loc.route_coordinates().coords
+					 _if loc[2]
+					 _then
+						 cable_out.add(loc[1])
+						 jml_cable_out +<< 1
+					 _endif 
+				_endloop 
+								 
+				 _for loc _over obj_name.mit_sheath_with_loc_pins.fast_elements()
+				 _loop					
+					 next_cable_coord << loc.sheath_with_loc.route_coordinates().coords					 
+
+					 #juga pake pendekatan result dari get connected cable karena tidak semuanya
+					 # lokasi first coord dari kabel sama dengan titik coord dari obyek
 					 _if next_cable_coord.first = data.location.coord
-					 _then															
-						 #scan OTB terdekat, if yes then exit
-						 ff << 100
-						 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)
-						
-						 next_cable << loc.sheath_with_loc						
-						 _leave							
+					 _then						
+						 #jika kablet out nya 2, cari yang proposed karena itu sambungan
+						 # dari syncron cable eksisting
+						  _if jml_cable_out > 1
+						  _then
+							  _for i _over cable_out.fast_elements()
+							  _loop
+								 _if loc.sheath_with_loc = i _andif i.construction_status = "Proposed"
+								 _then
+									 #scan OTB terdekat, if yes then exit
+									 ff << 100
+									 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)
+									# write(loc.sheath_with_loc.name)
+									# write("ketemu222 status otb: ", s_t_closure)
+									 next_cable << loc.sheath_with_loc
+									 _leave
+								 _else
+									 _continue 
+								_endif 
+  							  _endloop 
+					          _else 
+						 #scan OTB terdekat, if yes then exit						
+							 ff << 100
+							 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)							
+							# write("ketemu222 status otb: ", s_t_closure)
+							 next_cable << loc.sheath_with_loc
+							 _leave
+						  _endif
+					 _else
+						  _if jml_cable_out = 1
+						  _then
+							 next_cable_coord << cable_out[1].route_coordinates().coords	
+							#scan OTB terdekat, if yes then exit						
+							 ff << 100
+							 (s_t_closure,obj_t_closure) << _self.scan_OTB(next_cable_coord.last,ff)							
+							# write("ketemu3333 status otb: ", s_t_closure)
+							 next_cable << cable_out[1]
+							 _leave
+						 _endif 
 					 _endif
 				 _endloop
 						
@@ -2308,9 +2405,11 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 				 _loop
 					 
 					 _if kabel.sheath_with_loc = current_cable
-					 _then										 
-
-						 _if kabel.all_connections().size > 0 _then cable_in_id << kabel.all_connections().an_element() _endif
+					 _then									 
+						 _if kabel.all_connections().size > 0
+						 _then							 
+							 cable_in_id << kabel.all_connections().an_element()
+						 _endif
 						 
 						 _for in _over kabel.all_connections().fast_elements()
 						 _loop
@@ -2328,10 +2427,10 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 
 				 #khusus syncron cable, cari yang ujungnya proposed dan true,
 				 # maka itu lanjutan dari eksisting cable jadikan next cable
-				 _for i _over obj_name.get_connected_cables().fast_elements()
-				 _loop
-					 _if i[1].construction_status = "Proposed" _andif i[2] _then  next_cable << i[1] _endif 					 
-				 _endloop
+#				 _for i _over obj_name.get_connected_cables().fast_elements()
+#				 _loop
+#					 _if i[1].construction_status = "Proposed" _andif i[2] _then  next_cable << i[1] _endif 					 
+#				 _endloop
 				 ##################
 				 
 				 _for kabel _over obj_name.signal_cable_pins().fast_elements()
@@ -2339,25 +2438,29 @@ _method rwwi_apd_tools_dialog.scan_splice(splices, sheathlocs, next_cable, panel
 					 
 					 _if kabel.sheath_with_loc = next_cable
 					 _then
-						 #write("next: ", next_cable.name)
+					
 						 _for out _over kabel.all_connections().fast_elements()
-						 _loop								
-							 #Jika kabel current id = next cable id berarti itu sambungannya
+						 _loop
+							#							
+#							 #Jika kabel current id = next cable id berarti itu sambungannya
 							_if out = cable_in_id
 							_then
+																
 								_if out.pin2.act_low.as_number() <> out.pin2.act_high.as_number()
-									 _then
-										 #fiber berurutan
-										 _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
-										 _loop									 																		 panel_direction.add(fiber_num.write_string + "-" + fiber_num.write_string)
-										 _endloop
-									 _else
-										 #satu fiber
-										 panel_direction.add(out.pin1.act_low.write_string + "-" + out.pin2.act_low.write_string)
-									_endif 
+								 _then
+									 #fiber berurutan
 									 _for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
-									 _loop									 																		 panel_out.add(fiber_num)
-									 _endloop								 
+									 _loop									 												 panel_direction.add(fiber_num.write_string + "-" + fiber_num.write_string)
+									 _endloop
+								_else
+									 #satu fiber
+									 panel_direction.add(out.pin1.act_low.write_string + "-" + out.pin2.act_low.write_string)
+								_endif 
+
+								_for fiber_num _over range(out.pin2.act_low.as_number(), out.pin2.act_high.as_number())
+								 _loop									
+									 panel_out.add(fiber_num)
+								 _endloop								 
 							_endif 
 						 _endloop				
 					  _endif 
