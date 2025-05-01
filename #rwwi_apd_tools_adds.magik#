@@ -2783,8 +2783,8 @@ _method rwwi_apd_tools_dialog.cek_fttx()
 										 _for fiber_num _over range(out.pin1.act_low.as_number(), out.pin1.act_high.as_number())
 										 _loop
 											 fiber_num2 << out.pin2.act_low.as_number() + direct1
-											 direct1 +<< 1
 											 panel_direction.add(fiber_num.write_string + "-" + fiber_num2.write_string)
+											 direct1 +<< 1
 										 _endloop
 									 _else
 										 #satu fiber
